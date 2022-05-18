@@ -27,7 +27,7 @@ void list_free(list_t *l) {
   // individually free() each pointer in the array
   size_t list_size = l->size;
   for (size_t i = 0; i < list_size; i++) {
-    l->freer(list_remove(l, 0));
+    l->freer(list_get(l, i));
   }
   // free() the array and struct itself
   free(l->s);

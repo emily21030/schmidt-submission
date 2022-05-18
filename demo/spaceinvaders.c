@@ -202,11 +202,16 @@ void move_aliens(state_t *state) {
     body_t *alien = list_get(aliens, i);
     vector_t curr_centroid = body_get_centroid(alien);
     vector_t curr_velocity = body_get_velocity(alien);
-    if (X_SIZE - body_get_centroid(alien).x < (ALIEN_RADIUS + ALIEN_SPACING) ||
-        body_get_centroid(alien).x < (ALIEN_RADIUS + ALIEN_SPACING)) {
+    if (X_SIZE - body_get_centroid(alien).x < (ALIEN_RADIUS + ALIEN_SPACING)) {
       body_set_centroid(
           alien,
-          (vector_t){curr_centroid.x,
+          (vector_t){X_SIZE - (ALIEN_RADIUS + ALIEN_SPACING),
+                     curr_centroid.y - ALIEN_RADIUS_MULTIPLIER * ALIEN_RADIUS});
+      body_set_velocity(alien, vec_negate(curr_velocity));
+    } else if (body_get_centroid(alien).x < (ALIEN_RADIUS + ALIEN_SPACING)) {
+      body_set_centroid(
+          alien,
+          (vector_t){(ALIEN_RADIUS + ALIEN_SPACING),
                      curr_centroid.y - ALIEN_RADIUS_MULTIPLIER * ALIEN_RADIUS});
       body_set_velocity(alien, vec_negate(curr_velocity));
     }

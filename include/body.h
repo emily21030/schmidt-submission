@@ -52,6 +52,8 @@ void body_free(body_t *body);
  */
 list_t *body_get_shape(body_t *body);
 
+void body_set_shape(body_t *body, list_t *shape);
+
 /**
  * Gets the current center of mass of a body.
  * While this could be calculated with polygon_centroid(), that becomes too slow
@@ -175,9 +177,5 @@ void body_remove(body_t *body);
  * @return whether body_remove() has been called on the body
  */
 bool body_is_removed(body_t *body);
-
-void body_collide(body_t *body);
-
-bool body_is_collided(body_t *body);
 
 #endif // #ifndef __BODY_H__

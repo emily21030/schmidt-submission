@@ -82,6 +82,8 @@ body_t *scene_get_body(scene_t *scene, size_t index);
 
 list_t *scene_get_body_list(scene_t *scene);
 
+list_t *scene_get_forces(scene_t *scene);
+
 /**
  * Adds a body to a scene.
  *

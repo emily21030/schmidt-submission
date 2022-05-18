@@ -18,7 +18,7 @@ struct body {
   void *info;
   free_func_t freer;
   bool remove;
-  bool collided;
+  // bool collided;
 };
 
 body_t *body_init(list_t *shape, double mass, rgb_color_t color) {
@@ -39,7 +39,7 @@ body_t *body_init_with_info(list_t *shape, double mass, rgb_color_t color,
   b->info = info;
   b->freer = info_freer;
   b->remove = false;
-  b->collided = false;
+  // b->collided = false;
   return b;
 }
 
@@ -58,6 +58,11 @@ list_t *body_get_shape(body_t *body) {
     list_add(pointer, new_vec_p);
   }
   return pointer;
+}
+
+void body_set_shape(body_t *body, list_t *shape) {
+  list_free(body->shape);
+  body->shape = shape;
 }
 
 vector_t body_get_centroid(body_t *body) { return body->centroid; }
@@ -122,7 +127,3 @@ void body_tick(body_t *body, double dt) {
 void body_remove(body_t *body) { body->remove = true; }
 
 bool body_is_removed(body_t *body) { return body->remove; }
-
-void body_collide(body_t *body) { body->collided = true; }
-
-bool body_is_collided(body_t *body) { return body->collided; }
