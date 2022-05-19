@@ -17,6 +17,7 @@ const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
 const rgb_color_t RGB_GRAY = {0.5, 0.5, 0.5};
 const rgb_color_t RGB_BLACK = {0.0, 0.0, 0.0};
+const rgb_color_t RGB_WHITE = {1, 1, 1};
 const rgb_color_t RED = {1.0, 0.0, 0.0};
 const rgb_color_t ORANGE = {1.0, 0.5, 0.0};
 const rgb_color_t YELLOW = {1.0, 1.0, 0.0};
@@ -77,18 +78,17 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
   list_t *body_list = list_init(1, (free_func_t)body_free);
   for (int i = 0; i < n; i++) {
     body_t *body = scene_get_body(scene, i);
-    if ((char *)(body_get_info(body)) == type) {
+    if (strcmp((char *)(body_get_info(body)), type) == 0) {
       list_add(body_list, body);
-      // there's only one player of a particular type
-      // and one puck , so this will break out of the loop to save
-      // time
-      if ((char *)(body_get_info(body)) == PUCK_INFO) {
+      // save time by breaking from for loop if the type is that of the
+      // puck or either player since there is only one of each of those
+      if (strcmp((char *)(body_get_info(body)), PUCK_INFO) == 0) {
         break;
       }
-      else if ((char *)(body_get_info(body)) == PLAYER_1_INFO) {
+      else if (strcmp((char *)(body_get_info(body)), PLAYER_1_INFO) == 0) {
         break;
       }
-      else if ((char *)(body_get_info(body)) == PLAYER_2_INFO) {
+      else if (strcmp((char *)(body_get_info(body)), PLAYER_2_INFO) == 0) {
         break;
       }
     }
@@ -147,7 +147,7 @@ body_t *make_vertical_wall(double mass, vector_t center, char *info) {
   add_vec_ptr(shape, REC_WIDTH / 2, -Y_SIZE / 2);
 
   body_t *rec_body =
-      body_init_with_info(shape, mass, RGB_BLACK, (void *)info, free);
+      body_init_with_info(shape, mass, RGB_WHITE, (void *)info, free);
   body_set_centroid(rec_body, center);
   return rec_body;
 }
@@ -161,7 +161,49 @@ body_t *make_horizontal_wall(double mass, vector_t center, char *info) {
   add_vec_ptr(shape, X_SIZE / 2, -REC_HEIGHT / 2);
 
   body_t *rec_body =
-      body_init_with_info(shape, mass, RGB_BLACK, (void *)info, free);
+      body_init_with_info(shape, mass, RGB_WHITE, (void *)info, free);
   body_set_centroid(rec_body, center);
   return rec_body;
+}
+
+void make_walls(state_t *state) {
+  scene_add_body(
+      state->scene,
+      make_horizontal_wall(INFINITY,
+                           (vector_t){(X_SIZE / 2), Y_SIZE + (REC_HEIGHT / 2)},
+                           WALL_INFO));
+  scene_add_body(
+      state->scene,
+      make_horizontal_wall(INFINITY,
+                           (vector_t){(X_SIZE / 2), -(REC_HEIGHT / 2)},
+                           WALL_INFO));
+  scene_add_body(state->scene,
+                 make_vertical_wall(INFINITY,
+                                    (vector_t){-(REC_WIDTH / 2), Y_SIZE / 2},
+                                    WALL_INFO));
+  scene_add_body(state->scene,
+                 make_vertical_wall(
+                     INFINITY, (vector_t){X_SIZE + (REC_WIDTH / 2), Y_SIZE / 2},
+                     WALL_INFO));
+}
+
+void initialize_puck(state_t *state) {
+
+}
+
+void initialize_players(state_t *state) {
+
+}
+
+state_t *emscripten_init() {
+
+}
+
+void emscripten_main(state_t *state) {
+
+}
+
+void emscripten_free(state_t *state) {
+  scene_free(state->scene);
+  free(state);
 }

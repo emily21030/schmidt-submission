@@ -119,4 +119,8 @@ void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2);
  */
 void create_physics_collision(scene_t *scene, double elasticity, body_t *body1,
                               body_t *body2);
+
+void create_physics_collision_remove_1(scene_t *scene, double elasticity,
+                                       body_t *body1, body_t *body2);
+
 #endif // #ifndef __FORCES_H__

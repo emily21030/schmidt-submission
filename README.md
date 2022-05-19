@@ -11,7 +11,7 @@ Game!!
 
 **RESOURCES USED:** none
 
-## Wednesday, 5/18, 12:30am - 1:30am
+## Wednesday, 5/18, 12:30am - 2:30am
 **WHO:** Kaushik
 
 **WHAT:** began setting up airhockey.c demo file

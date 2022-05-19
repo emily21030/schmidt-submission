@@ -6,87 +6,72 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-list_t *get_axes(list_t *vertices) {
-  list_t *axes = list_init(list_size(vertices), free);
-  for (int i = 0; i < list_size(vertices); i++) {
-    vector_t vec_1 = ((vector_t *)list_get(vertices, i))[0];
-    vector_t vec_2 =
-        ((vector_t *)list_get(vertices, (i + 1) % list_size(vertices)))[0];
-    vector_t edge = vec_subtract(vec_1, vec_2);
-    vector_t *normal = malloc(sizeof(vector_t));
-    normal->x = edge.y;
-    normal->y = -(edge.x);
-    list_add(axes, normal);
-  }
-  return axes;
-}
-
-double *find_projection(list_t *shape, vector_t axis) {
-  double *projection = malloc(sizeof(double) * 2);
-  double min = vec_dot(vec_norm(axis), ((vector_t *)list_get(shape, 0))[0]);
-  double max = min;
-  for (int i = 1; i < list_size(shape); i++) {
-    double proj = vec_dot(vec_norm(axis), ((vector_t *)list_get(shape, i))[0]);
-    if (proj < min) {
-      min = proj;
-    } else if (proj > max) {
-      max = proj;
+double *min_max(list_t *shape, vector_t axis) {
+  double *minmax = malloc(2 * sizeof(double));
+  double min = INFINITY;
+  double max = -INFINITY;
+  for (size_t j = 0; j < list_size(shape); j++) {
+    double point = vec_dot(*(vector_t *)list_get(shape, j), axis);
+    if (point < min) {
+      min = point;
+    }
+    if (point > max) {
+      max = point;
     }
   }
-  projection[0] = min;
-  projection[1] = max;
-  return projection;
+  minmax[0] = min;
+  minmax[1] = max;
+  return minmax;
 }
 
 collision_info_t find_collision(list_t *shape1, list_t *shape2) {
-  collision_info_t collision = {true}; // work on this.
-  list_t *axes_shape_1 = get_axes(shape1);
-  list_t *axes_shape_2 = get_axes(shape2);
-  // maximum separation of bodies, this is a vlaue that will quickly be replaced
-  double min_overlap = INFINITY;
-  for (int i = 0; i < list_size(axes_shape_1); i++) {
-    vector_t axis_to_check = *((vector_t *)list_get(axes_shape_1, i));
-    double *proj_1 = find_projection(shape1, axis_to_check);
-    double *proj_2 = find_projection(shape2, axis_to_check);
-    double overlap_1_on_2 = proj_1[1] - proj_2[0];
-    double overlap_2_on_1 = proj_2[1] - proj_1[0];
-    // check that objects are not collided
-    if (overlap_1_on_2 < 0 || overlap_2_on_1 < 0) {
-      collision.collided = false;
+  collision_info_t collision = {.collided = false};
+  double min = INFINITY;
+  for (size_t i = 0; i < list_size(shape1); i++) {
+    vector_t edge = vec_subtract(
+        *(vector_t *)list_get(shape1, i),
+        *(vector_t *)list_get(shape1, (i + 1) % list_size(shape1)));
+    vector_t axis = vec_norm((vector_t){edge.y, -edge.x});
+    double *min_and_max1 = min_max(shape1, axis);
+    double min1 = min_and_max1[0];
+    double max1 = min_and_max1[1];
+    double *min_and_max2 = min_max(shape2, axis);
+    double min2 = min_and_max2[0];
+    double max2 = min_and_max2[1];
+    free(min_and_max1);
+    free(min_and_max2);
+    if ((min1 > max2 || min2 > max1)) {
+      return collision;
     }
-    // check for impulse axis
-    else if (overlap_1_on_2 > 0 && overlap_1_on_2 < min_overlap) {
-      min_overlap = overlap_1_on_2;
-      collision.axis = axis_to_check;
-    } else if (overlap_2_on_1 > 0 && overlap_2_on_1 < min_overlap) {
-      min_overlap = overlap_2_on_1;
-      collision.axis = axis_to_check;
+    double overlap = fmin(max2 - min1, max1 - min2);
+
+    if (overlap < min) {
+      collision.axis = axis;
+      min = overlap;
     }
-    free(proj_1);
-    free(proj_2);
   }
-  for (int i = 0; i < list_size(axes_shape_2); i++) {
-    vector_t axis_to_check = *((vector_t *)list_get(axes_shape_2, i));
-    double *proj_1 = find_projection(shape1, axis_to_check);
-    double *proj_2 = find_projection(shape2, axis_to_check);
-    double overlap_1_on_2 = proj_1[1] - proj_2[0];
-    double overlap_2_on_1 = proj_2[1] - proj_1[0];
-    // check that objects are not collided
-    if (overlap_1_on_2 < 0 || overlap_2_on_1 < 0) {
-      collision.collided = false;
+  for (size_t i = 0; i < list_size(shape2); i++) {
+    vector_t edge = vec_subtract(
+        *(vector_t *)list_get(shape2, i),
+        *(vector_t *)list_get(shape2, (i + 1) % list_size(shape2)));
+    vector_t axis = vec_norm((vector_t){edge.y, -edge.x});
+    double *min_and_max1 = min_max(shape1, axis);
+    double min1 = min_and_max1[0];
+    double max1 = min_and_max1[1];
+    double *min_and_max2 = min_max(shape2, axis);
+    double min2 = min_and_max2[0];
+    double max2 = min_and_max2[1];
+    free(min_and_max1);
+    free(min_and_max2);
+    if ((min1 > max2 || min2 > max1)) {
+      return collision;
     }
-    // check for impulse axis
-    else if (overlap_1_on_2 > 0 && overlap_1_on_2 < min_overlap) {
-      min_overlap = overlap_1_on_2;
-      collision.axis = axis_to_check;
-    } else if (overlap_2_on_1 > 0 && overlap_2_on_1 < min_overlap) {
-      min_overlap = overlap_2_on_1;
-      collision.axis = axis_to_check;
+    double overlap = fmin(max2 - min1, max1 - min2);
+    if (overlap < min) {
+      collision.axis = axis;
+      min = overlap;
     }
-    free(proj_1);
-    free(proj_2);
   }
-  free(axes_shape_1);
-  free(axes_shape_2);
+  collision.collided = true;
   return collision;
 }

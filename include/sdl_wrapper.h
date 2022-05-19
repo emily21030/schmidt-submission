@@ -11,7 +11,14 @@ typedef enum {
   UP_ARROW = 2,
   RIGHT_ARROW = 3,
   DOWN_ARROW = 4,
-  SPACE_BAR = 5
+  SPACE_BAR = 5,
+  W_KEY = 6,
+  A_KEY = 7,
+  S_KEY = 8,
+  D_KEY = 9,
+  P_KEY = 10,
+  M_KEY = 11,
+  G_KEY = 12
 } arrow_key_t;
 
 /**
