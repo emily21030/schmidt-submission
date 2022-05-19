@@ -44,8 +44,14 @@ char *PLAYER_2_INFO = "2";
 char *PUCK_INFO = "p";
 char *WALL_INFO = "w";
 
+int PPG = 1; 
+int PPG_POWERUP = 2; 
+
 typedef struct state {
   scene_t *scene;
+  body_t *last_touched;
+  body_t *other_player;
+  int ppg; // points per goal
 } state_t;
 
 void *add_vec_ptr(list_t *shape, double x, double y) {

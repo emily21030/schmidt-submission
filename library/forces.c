@@ -213,4 +213,8 @@ void create_physics_collision_remove_1(scene_t *scene, double elasticity,
   aux_t *new_aux = aux_init(elasticity, bodies);
   create_collision(scene, body1, body2, make_phys_collision_remove_1, new_aux,
                    NULL);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 8dedfe4f8df2bd1b59c13afcef9c366f7665c0f3
