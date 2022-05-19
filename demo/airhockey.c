@@ -19,7 +19,7 @@ const double Y_SCOREBOARD = 200.0;
 const double PADDING = 100.0;
 const double X_ORIGIN = 0;
 const double Y_ORIGIN = 0;
-const double WALL_THICKNESS = 25.0;
+const double WALL_THICKNESS = 20.0;
 
 const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
@@ -52,10 +52,22 @@ const char PLAYER_2_INFO_C = '2';
 const char PUCK_INFO_C = 'p';
 const char WALL_INFO_C = 'w';  
 
+const char X2_PUCK_VEL_INFO_C = 'v';
+const char X2_NEXT_GOAL_INFO_C = 'g';
+const char X2_PLAYER_ACC_INFO_C = 'a';
+const char HALF_ENEMY_ACC_INFO_C = 'e';
+const char FREEZE_ENEMY_INFO_C = 'f';
+
 char *PLAYER_1_INFO = "1";
 char *PLAYER_2_INFO = "2";
 char *PUCK_INFO = "p";
 char *WALL_INFO = "w";  
+
+const char *X2_PUCK_VEL_INFO = "v";
+const char *X2_NEXT_GOAL_INFO = "g";
+const char *X2_PLAYER_ACC_INFO = "a";
+const char *HALF_ENEMY_ACC_INFO = "e";
+const char *FREEZE_ENEMY_INFO = "f";
 
 int PPG = 1; 
 int PPG_POWERUP = 2; 
@@ -64,6 +76,7 @@ typedef struct state {
   scene_t *scene;
   body_t *last_touched;
   body_t *other_player;
+  char *powerup_active;
   int ppg; // points per goal
 } state_t;
 
@@ -162,11 +175,11 @@ void check_player_2_boundary(state_t *state) {
 
 body_t *make_vertical_wall(double mass, vector_t center, char *info) {
   list_t *shape = list_init(4, free);
-
-  add_vec_ptr(shape, -WALL_THICKNESS / 2, Y_TABLE / 2);
-  add_vec_ptr(shape, WALL_THICKNESS / 2, Y_TABLE / 2);
-  add_vec_ptr(shape, -WALL_THICKNESS / 2, -Y_TABLE / 2);
+  
   add_vec_ptr(shape, WALL_THICKNESS / 2, -Y_TABLE / 2);
+  add_vec_ptr(shape, WALL_THICKNESS / 2, Y_TABLE / 2);
+  add_vec_ptr(shape, -WALL_THICKNESS / 2, Y_TABLE / 2);
+  add_vec_ptr(shape, -WALL_THICKNESS / 2, -Y_TABLE / 2);
 
   body_t *rec_body =
       body_init_with_info(shape, mass, RGB_BLACK, (void *)info, free);
@@ -177,11 +190,11 @@ body_t *make_vertical_wall(double mass, vector_t center, char *info) {
 body_t *make_horizontal_wall(double mass, vector_t center, char *info) {
   list_t *shape = list_init(4, free);
 
-  add_vec_ptr(shape, -X_TABLE / 2, WALL_THICKNESS / 2);
-  add_vec_ptr(shape, X_TABLE / 2, WALL_THICKNESS / 2);
-  add_vec_ptr(shape, -X_TABLE / 2, -WALL_THICKNESS / 2);
   add_vec_ptr(shape, X_TABLE / 2, -WALL_THICKNESS / 2);
-
+  add_vec_ptr(shape, X_TABLE / 2, WALL_THICKNESS / 2);
+  add_vec_ptr(shape, -X_TABLE / 2, WALL_THICKNESS / 2);
+  add_vec_ptr(shape, -X_TABLE / 2, -WALL_THICKNESS / 2);
+  
   body_t *rec_body =
       body_init_with_info(shape, mass, RGB_BLACK, (void *)info, free);
   body_set_centroid(rec_body, center);
@@ -192,12 +205,12 @@ void make_walls(state_t *state) {
   scene_add_body(
       state->scene,
       make_horizontal_wall(INFINITY,
-                           (vector_t){(X_SIZE / 2) + PADDING, Y_TABLE + PADDING - (WALL_THICKNESS / 2)},
+                           (vector_t){(X_SIZE / 2), Y_TABLE + PADDING - (WALL_THICKNESS / 2)},
                            WALL_INFO));
   scene_add_body(
       state->scene,
       make_horizontal_wall(INFINITY,
-                           (vector_t){(X_SIZE / 2) + PADDING, PADDING + (WALL_THICKNESS / 2)},
+                           (vector_t){(X_SIZE / 2), PADDING + (WALL_THICKNESS / 2)},
                            WALL_INFO));
   scene_add_body(state->scene,
                  make_vertical_wall(INFINITY,
@@ -205,33 +218,43 @@ void make_walls(state_t *state) {
                                     WALL_INFO));
   scene_add_body(state->scene,
                  make_vertical_wall(
-                     INFINITY, (vector_t){X_SIZE + PADDING - (WALL_THICKNESS / 2), PADDING + (Y_TABLE / 2)},
+                     INFINITY, (vector_t){X_SIZE - PADDING - (WALL_THICKNESS / 2), PADDING + (Y_TABLE / 2)},
                      WALL_INFO));
 }
 
 void initialize_players(state_t *state) {
-  body_t *player_1 = make_circle(PADDLE_MASS, GREEN_1, (vector_t){(X_SIZE / 2) + PADDING - 2 * WALL_THICKNESS, (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_1_INFO);
-  body_t *player_2 = make_circle(PADDLE_MASS, GREEN_1, (vector_t){(X_SIZE / 2) + PADDING + 2 * WALL_THICKNESS, (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_2_INFO);
+  body_t *player_1 = make_circle(PADDLE_MASS, GREEN_1, (vector_t){PADDING + WALL_THICKNESS + (X_TABLE / 4) , (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_1_INFO);
+  body_t *player_2 = make_circle(PADDLE_MASS, GREEN_1, (vector_t){X_SIZE - PADDING - WALL_THICKNESS - (X_TABLE / 4), (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_2_INFO);
 
   scene_add_body(state->scene, player_1);
   scene_add_body(state->scene, player_2);
 
   for (size_t i = 0; i < scene_bodies(state->scene); i++) {
     body_t *body = scene_get_body(state->scene, i);
-    if (strcmp(body_get_info(body), WALL_INFO) == 0) {
+    switch (*((char *)body_get_info(body))) {
+      case WALL_INFO_C:
       create_physics_collision(state->scene, 1, player_1, body);
       create_physics_collision(state->scene, 1, player_2, body);
+      break;
     }
   }
 }
 
 void initialize_puck(state_t *state) {
-  body_t *puck = make_circle(PUCK_MASS, RED, (vector_t){(X_SIZE / 2) + PADDING, (Y_TABLE / 2) + PADDING}, PUCK_RADIUS, PUCK_INFO);
+  body_t *puck = make_circle(PUCK_MASS, RED, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING}, PUCK_RADIUS, PUCK_INFO);
   scene_add_body(state->scene, puck);
   for (size_t i = 0; i < scene_bodies(state->scene); i++) {
     body_t *body = scene_get_body(state->scene, i);
-    if (strcmp(body_get_info(body), PUCK_INFO) != 0) {
-      create_physics_collision(state->scene, 1, puck, body);
+    switch (*((char *)body_get_info(body))) {
+      case WALL_INFO_C:
+        create_physics_collision(state->scene, 1, puck, body);
+        break;
+      case PLAYER_1_INFO_C:
+        create_physics_collision(state->scene, 1, puck, body);
+        break;
+      case PLAYER_2_INFO_C:
+        create_physics_collision(state->scene, 1, puck, body);
+        break;
     }
   }
 }
@@ -247,6 +270,8 @@ state_t *emscripten_init() {
 
   state->last_touched = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  state->ppg = PPG;
+  state->powerup_active = NULL;
   //sdl_on_key((key_handler_t)key_handler_func);
   return state;
 

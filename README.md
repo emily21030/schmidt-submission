@@ -37,3 +37,12 @@ Game!!
 **BUGS:** Walls aren't being displayed, and the puck is off-center at initialization. Also we need to do keyboard stuff. 
 
 **RESOURCES USED:** none
+
+## Thursday, 5/18 1:30pm - 2:15pm
+**WHO:** Emily
+
+**WHAT:** Set up powerup in state, trying to display walls. Fixed puck placement.
+
+**BUGS:** Walls aren't being displayed, and the puck is off-center at initialization. Also we need to do keyboard stuff. 
+
+**RESOURCES USED:** libraries: SDL_mixer 2.0 for sound, sdl ttf, sdl image
