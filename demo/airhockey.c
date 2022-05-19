@@ -39,10 +39,10 @@ const rgb_color_t PINK = {1.0, 0.0, 0.5};
 
 const double PADDLE_MASS = 5.0;
 const double PADDLE_RADIUS = 40;
-const vector_t LEFT_VEL = {-200, 0};
-const vector_t RIGHT_VEL = {200, 0};
-const vector_t UP_VEL = {0, 200};
-const vector_t DOWN_VEL = {0, -200};
+const vector_t UP_ACCEL = {0, 10};
+const vector_t DOWN_ACCEL = {0, -10};
+const vector_t LEFT_ACCEL = {-10, 0};
+const vector_t RIGHT_ACCEL = {10, 0};
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int CIRCLE_SIDES = 40;
@@ -127,6 +127,47 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
     }
   }
   return body_list;
+}
+
+void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
+  vector_t new_velocity = vec_add(body_get_velocity(body), vec_multiply(dt, acceleration));
+  body_set_velocity(body, new_velocity);
+}
+
+void key_handler_func(state_t *state, char key_pressed,
+                      key_event_type_t event_type, double dt) {
+  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  if (event_type == KEY_PRESSED) {
+    switch (key_pressed) {
+    case D_KEY:
+      key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
+      break;
+    case A_KEY:
+      key_handler_func_helper(dt, player_1, LEFT_ACCEL);
+      break;
+    case W_KEY:
+      key_handler_func_helper(dt, player_1, UP_ACCEL);
+      break;
+    case S_KEY:
+      key_handler_func_helper(dt, player_1, DOWN_ACCEL);
+      break;
+    case RIGHT_ARROW:
+      key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
+      break;
+    case LEFT_ARROW:
+      key_handler_func_helper(dt, player_2, LEFT_ACCEL);
+      break;
+    case UP_ARROW:
+      key_handler_func_helper(dt, player_2, UP_ACCEL);
+      break;
+    case DOWN_ARROW:
+      key_handler_func_helper(dt, player_2, DOWN_ACCEL);
+      break;
+    default:
+      break;
+    }
+  } 
 }
 
 void check_player_1_boundary(state_t *state) {
@@ -272,9 +313,8 @@ state_t *emscripten_init() {
   state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   state->ppg = PPG;
   state->powerup_active = NULL;
-  //sdl_on_key((key_handler_t)key_handler_func);
+  sdl_on_key((key_handler_t)key_handler_func);
   return state;
-
 }
 
 void emscripten_main(state_t *state) {
