@@ -126,8 +126,4 @@ void body_tick(body_t *body, double dt) {
 
 void body_remove(body_t *body) { body->remove = true; }
 
-<<<<<<< HEAD
 bool body_is_removed(body_t *body) { return body->remove; }
-=======
-bool body_is_removed(body_t *body) { return body->remove; }
->>>>>>> 8dedfe4f8df2bd1b59c13afcef9c366f7665c0f3

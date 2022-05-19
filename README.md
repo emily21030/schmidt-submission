@@ -28,3 +28,12 @@ Game!!
 **BUGS:** none yet. Not really a bug but for whatever reason I wrote it as an h file. This file will disappear when I move it into the demo. DW. 
 
 **RESOURCES USED:** none
+
+## Wednesday, 5/18 - Thursday, 5/19 11:00pm - 2:15am
+**WHO:** Avi and Kaushik
+
+**WHAT:** Set up display for table, puck, players, and walls. 
+
+**BUGS:** Walls aren't being displayed, and the puck is off-center at initialization. Also we need to do keyboard stuff. 
+
+**RESOURCES USED:** none
