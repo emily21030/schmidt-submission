@@ -20,6 +20,7 @@ const double PADDING = 100.0;
 const double X_ORIGIN = 0;
 const double Y_ORIGIN = 0;
 const double WALL_THICKNESS = 20.0;
+const double GOAL_WIDTH = 200.0;
 
 const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
@@ -47,6 +48,7 @@ const double MAX_VEL = 400;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int CIRCLE_SIDES = 40;
+const int WIN_THRESHOLD = 7;
 
 const char PLAYER_1_INFO_C = '1';
 const char PLAYER_2_INFO_C = '2';
@@ -79,6 +81,8 @@ typedef struct state {
   body_t *other_player;
   char *powerup_active;
   int ppg; // points per goal
+  int player_1_score;
+  int player_2_score;
 } state_t;
 
 void add_vec_ptr(list_t *shape, double x, double y) {
@@ -171,38 +175,36 @@ void key_handler_func(state_t *state, char key_pressed,
     default:
       break;
     } 
-  } else if (event_type == KEY_RELEASED) {
-    switch (key_pressed) {
-    case D_KEY:
-      key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
-      break;
-    case A_KEY:
-      key_handler_func_helper(dt, player_1, LEFT_ACCEL);
-      break;
-    case W_KEY:
-      key_handler_func_helper(dt, player_1, UP_ACCEL);
-      break;
-    case S_KEY:
-      key_handler_func_helper(dt, player_1, DOWN_ACCEL);
-      break;
-    case RIGHT_ARROW:
-      key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
-      break;
-    case LEFT_ARROW:
-      key_handler_func_helper(dt, player_2, LEFT_ACCEL);
-      break;
-    case UP_ARROW:
-      key_handler_func_helper(dt, player_2, UP_ACCEL);
-      break;
-    case DOWN_ARROW:
-      key_handler_func_helper(dt, player_2, DOWN_ACCEL);
-      break;
-    default:
-      break;
-    } 
+  // } else if (event_type == KEY_RELEASED) {
+  //   switch (key_pressed) {
+  //   case D_KEY:
+  //     key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
+  //     break;
+  //   case A_KEY:
+  //     key_handler_func_helper(dt, player_1, LEFT_ACCEL);
+  //     break;
+  //   case W_KEY:
+  //     key_handler_func_helper(dt, player_1, UP_ACCEL);
+  //     break;
+  //   case S_KEY:
+  //     key_handler_func_helper(dt, player_1, DOWN_ACCEL);
+  //     break;
+  //   case RIGHT_ARROW:
+  //     key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
+  //     break;
+  //   case LEFT_ARROW:
+  //     key_handler_func_helper(dt, player_2, LEFT_ACCEL);
+  //     break;
+  //   case UP_ARROW:
+  //     key_handler_func_helper(dt, player_2, UP_ACCEL);
+  //     break;
+  //   case DOWN_ARROW:
+  //     key_handler_func_helper(dt, player_2, DOWN_ACCEL);
+  //     break;
+  //   default:
+  //     break;
+  //   } 
     
-  }
-
   }
 }
 
@@ -251,10 +253,10 @@ void check_player_2_boundary(state_t *state) {
 body_t *make_vertical_wall(double mass, vector_t center, char *info) {
   list_t *shape = list_init(4, free);
   
-  add_vec_ptr(shape, WALL_THICKNESS / 2, -Y_TABLE / 2);
-  add_vec_ptr(shape, WALL_THICKNESS / 2, Y_TABLE / 2);
-  add_vec_ptr(shape, -WALL_THICKNESS / 2, Y_TABLE / 2);
-  add_vec_ptr(shape, -WALL_THICKNESS / 2, -Y_TABLE / 2);
+  add_vec_ptr(shape, WALL_THICKNESS / 2, -(Y_TABLE - GOAL_WIDTH)/4);
+  add_vec_ptr(shape, WALL_THICKNESS / 2, (Y_TABLE - GOAL_WIDTH)/4);
+  add_vec_ptr(shape, -WALL_THICKNESS / 2, (Y_TABLE - GOAL_WIDTH)/4);
+  add_vec_ptr(shape, -WALL_THICKNESS / 2, -(Y_TABLE - GOAL_WIDTH)/4);
 
   body_t *rec_body =
       body_init_with_info(shape, mass, RGB_BLACK, (void *)info, free);
@@ -289,11 +291,19 @@ void make_walls(state_t *state) {
                            WALL_INFO));
   scene_add_body(state->scene,
                  make_vertical_wall(INFINITY,
-                                    (vector_t){PADDING + (WALL_THICKNESS / 2), PADDING + (Y_TABLE / 2)},
+                                    (vector_t){PADDING + (WALL_THICKNESS / 2), PADDING + (Y_TABLE - GOAL_WIDTH)/4},
+                                    WALL_INFO));
+  scene_add_body(state->scene,
+                 make_vertical_wall(INFINITY,
+                                    (vector_t){PADDING + (WALL_THICKNESS / 2), PADDING + Y_TABLE - (Y_TABLE - GOAL_WIDTH)/4},
                                     WALL_INFO));
   scene_add_body(state->scene,
                  make_vertical_wall(
-                     INFINITY, (vector_t){X_SIZE - PADDING - (WALL_THICKNESS / 2), PADDING + (Y_TABLE / 2)},
+                     INFINITY, (vector_t){X_SIZE - PADDING - (WALL_THICKNESS / 2), PADDING + (Y_TABLE - GOAL_WIDTH)/4},
+                     WALL_INFO));
+  scene_add_body(state->scene,
+                 make_vertical_wall(
+                     INFINITY, (vector_t){X_SIZE - PADDING - (WALL_THICKNESS / 2), PADDING + Y_TABLE - (Y_TABLE - GOAL_WIDTH)/4},
                      WALL_INFO));
 }
 
@@ -334,6 +344,27 @@ void initialize_puck(state_t *state) {
   }
 }
 
+void check_win(state_t *state) {
+  if (state->player_1_score >= WIN_THRESHOLD) {
+    printf("Player 1 wins! \n");
+    exit(0);
+  } else if (state->player_2_score >= WIN_THRESHOLD) {
+    printf("Player 2 wins! \n");
+    exit(0);
+  }
+}
+
+void check_goal(state_t *state) {
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  if (body_get_centroid(puck).x > X_SIZE - PADDING - (WALL_THICKNESS / 2)) {
+    state->player_1_score++;
+    body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
+  } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
+    state->player_2_score++;
+    body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
+  }
+}
+
 state_t *emscripten_init() {
   srand(time(NULL));
   sdl_init(VEC_ZERO, (vector_t){X_SIZE, Y_SIZE});
@@ -347,6 +378,8 @@ state_t *emscripten_init() {
   state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   state->ppg = PPG;
   state->powerup_active = NULL;
+  state->player_1_score = 0;
+  state->player_2_score = 0;
   sdl_on_key((key_handler_t)key_handler_func);
   return state;
 }
@@ -357,6 +390,8 @@ void emscripten_main(state_t *state) {
   check_player_1_boundary(state);
   check_player_2_boundary(state);
   scene_tick(state->scene, dt);
+  check_goal(state);
+  check_win(state);
   sdl_render_scene(state->scene);
 }
 
