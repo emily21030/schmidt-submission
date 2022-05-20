@@ -46,3 +46,12 @@ Game!!
 **BUGS:** Walls aren't being displayed, and the puck is off-center at initialization. Also we need to do keyboard stuff. 
 
 **RESOURCES USED:** libraries: SDL_mixer 2.0 for sound, sdl ttf, sdl image
+
+## Thursday, 5/18 11:00pm - 11:59pm
+**WHO:** Avi and Kaushik
+
+**WHAT:** Added goals, scoring, and checking win condition. 
+
+**BUGS:** 
+
+**RESOURCES USED:** libraries: SDL_mixer 2.0 for sound, sdl ttf, sdl image
