@@ -39,10 +39,11 @@ const rgb_color_t PINK = {1.0, 0.0, 0.5};
 
 const double PADDLE_MASS = 5.0;
 const double PADDLE_RADIUS = 40;
-const vector_t UP_ACCEL = {0, 10};
-const vector_t DOWN_ACCEL = {0, -10};
-const vector_t LEFT_ACCEL = {-10, 0};
-const vector_t RIGHT_ACCEL = {10, 0};
+const vector_t UP_ACCEL = {0, 200};
+const vector_t DOWN_ACCEL = {0, -200};
+const vector_t LEFT_ACCEL = {-200, 0};
+const vector_t RIGHT_ACCEL = {200, 0};
+const double MAX_VEL = 400;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int CIRCLE_SIDES = 40;
@@ -131,7 +132,10 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
 
 void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
   vector_t new_velocity = vec_add(body_get_velocity(body), vec_multiply(dt, acceleration));
-  body_set_velocity(body, new_velocity);
+  if (sqrt(vec_dot(new_velocity, new_velocity) > MAX_VEL)) {
+    new_velocity = vec_multiply(MAX_VEL, unit_vector(new_velocity));
+  }
+  body_set_velocity(body, new_velocity);  
 }
 
 void key_handler_func(state_t *state, char key_pressed,
@@ -166,8 +170,40 @@ void key_handler_func(state_t *state, char key_pressed,
       break;
     default:
       break;
-    }
-  } 
+    } 
+  } else if (event_type == KEY_RELEASED) {
+    switch (key_pressed) {
+    case D_KEY:
+      key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
+      break;
+    case A_KEY:
+      key_handler_func_helper(dt, player_1, LEFT_ACCEL);
+      break;
+    case W_KEY:
+      key_handler_func_helper(dt, player_1, UP_ACCEL);
+      break;
+    case S_KEY:
+      key_handler_func_helper(dt, player_1, DOWN_ACCEL);
+      break;
+    case RIGHT_ARROW:
+      key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
+      break;
+    case LEFT_ARROW:
+      key_handler_func_helper(dt, player_2, LEFT_ACCEL);
+      break;
+    case UP_ARROW:
+      key_handler_func_helper(dt, player_2, UP_ACCEL);
+      break;
+    case DOWN_ARROW:
+      key_handler_func_helper(dt, player_2, DOWN_ACCEL);
+      break;
+    default:
+      break;
+    } 
+    
+  }
+
+  }
 }
 
 void check_player_1_boundary(state_t *state) {
@@ -177,18 +213,17 @@ void check_player_1_boundary(state_t *state) {
     body_set_centroid(player,
                       (vector_t){(X_TABLE/2 + PADDING) - PADDLE_RADIUS, curr_centroid.y});
     body_set_velocity(player, VEC_ZERO);
-  // } else if (body_get_centroid(player).x < PADDLE_RADIUS + PADDING) {
-  //   body_set_centroid(player, (vector_t){PADDLE_RADIUS + PADDING, curr_centroid.y});
-  //   body_set_velocity(player, VEC_ZERO);
-  // }
-  // else if (Y_TABLE + PADDING - body_get_centroid(player).y < PADDLE_RADIUS) {
-  //   body_set_centroid(player, (vector_t){curr_centroid.x, Y_TABLE + PADDING - PADDLE_RADIUS});
-  //   body_set_velocity(player, VEC_ZERO);
-  // }
-  // else if (body_get_centroid(player).y < PADDLE_RADIUS + PADDING) {
-  //   body_set_centroid(player, (vector_t){curr_centroid.x, PADDLE_RADIUS + PADDING});
-  //   body_set_velocity(player, VEC_ZERO);
-  // }
+  } else if (body_get_centroid(player).x < PADDLE_RADIUS + PADDING + WALL_THICKNESS) {
+    body_set_centroid(player, (vector_t){PADDLE_RADIUS + PADDING + WALL_THICKNESS, curr_centroid.y});
+    body_set_velocity(player, VEC_ZERO);
+  }
+  else if (Y_TABLE + PADDING - WALL_THICKNESS - body_get_centroid(player).y < PADDLE_RADIUS) {
+    body_set_centroid(player, (vector_t){curr_centroid.x, Y_TABLE + PADDING - WALL_THICKNESS - PADDLE_RADIUS});
+    body_set_velocity(player, VEC_ZERO);
+  }
+  else if (body_get_centroid(player).y < PADDLE_RADIUS + PADDING + WALL_THICKNESS) {
+    body_set_centroid(player, (vector_t){curr_centroid.x, PADDLE_RADIUS + PADDING + WALL_THICKNESS});
+    body_set_velocity(player, VEC_ZERO);
   }
 }
 
@@ -199,18 +234,17 @@ void check_player_2_boundary(state_t *state) {
     body_set_centroid(player,
                       (vector_t){(X_TABLE/2 + PADDLE_RADIUS + PADDING), curr_centroid.y});
     body_set_velocity(player, VEC_ZERO);
-  // } else if (X_TABLE + PADDING - body_get_centroid(player).x < PADDLE_RADIUS) {
-  //   body_set_centroid(player, (vector_t){X_TABLE + PADDING - PADDLE_RADIUS, curr_centroid.y});
-  //   body_set_velocity(player, VEC_ZERO);
-  // }
-  // else if (Y_TABLE + PADDING - body_get_centroid(player).y < PADDLE_RADIUS) {
-  //   body_set_centroid(player, (vector_t){curr_centroid.x, Y_TABLE + PADDING - PADDLE_RADIUS});
-  //   body_set_velocity(player, VEC_ZERO);
-  // }
-  // else if (body_get_centroid(player).y < PADDLE_RADIUS + PADDING) {
-  //   body_set_centroid(player, (vector_t){curr_centroid.x, PADDLE_RADIUS + PADDING});
-  //   body_set_velocity(player, VEC_ZERO);
-  // }
+  } else if (X_TABLE + PADDING - WALL_THICKNESS - body_get_centroid(player).x < PADDLE_RADIUS) {
+    body_set_centroid(player, (vector_t){X_TABLE + PADDING - PADDLE_RADIUS - WALL_THICKNESS, curr_centroid.y});
+    body_set_velocity(player, VEC_ZERO);
+  }
+  else if (Y_TABLE + PADDING - WALL_THICKNESS - body_get_centroid(player).y < PADDLE_RADIUS) {
+    body_set_centroid(player, (vector_t){curr_centroid.x, Y_TABLE + PADDING - WALL_THICKNESS - PADDLE_RADIUS});
+    body_set_velocity(player, VEC_ZERO);
+  }
+  else if (body_get_centroid(player).y < PADDLE_RADIUS + PADDING + WALL_THICKNESS) {
+    body_set_centroid(player, (vector_t){curr_centroid.x, PADDLE_RADIUS + PADDING + WALL_THICKNESS});
+    body_set_velocity(player, VEC_ZERO);
   }
 }
 
@@ -274,8 +308,8 @@ void initialize_players(state_t *state) {
     body_t *body = scene_get_body(state->scene, i);
     switch (*((char *)body_get_info(body))) {
       case WALL_INFO_C:
-      create_physics_collision(state->scene, 1, player_1, body);
-      create_physics_collision(state->scene, 1, player_2, body);
+      create_physics_collision(state->scene, 0, player_1, body);
+      create_physics_collision(state->scene, 0, player_2, body);
       break;
     }
   }
