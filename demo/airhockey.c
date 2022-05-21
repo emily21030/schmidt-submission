@@ -355,7 +355,7 @@ SDL_Texture *win_screen(char* msg, TTF_Font *font) {
 }
 
 void check_win(state_t *state) {
-  TTF_Font *pacifico = TTF_OpenFont("./assets/Pacifico.ttf", 12); 
+  TTF_Font *pacifico = TTF_OpenFont("../assets/Pacifico.ttf", 12); 
   if (state->player_1_score >= WIN_THRESHOLD) {
     sdl_render_text(win_screen("Player 1 wins!", pacifico), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
     printf("Player 1 wins! \n");
@@ -400,7 +400,8 @@ void emscripten_main(state_t *state) {
   sdl_clear();
   body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
   SDL_Surface *inkcircle = IMG_Load("./assets/inkcircle.png");
-  sdl_body_image(inkcircle, puck);
+  SDL_Texture *inkcircle_texture = sdl_make_image(inkcircle);
+  sdl_body_image(inkcircle_texture, puck);
   double dt = time_since_last_tick();
   check_player_1_boundary(state);
   check_player_2_boundary(state);
