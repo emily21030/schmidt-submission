@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "math.h": "c",
-    "sdl_wrapper.h": "c"
+    "sdl_wrapper.h": "c",
+    "sdl2_gfxprimitives.h": "c"
   }
 }

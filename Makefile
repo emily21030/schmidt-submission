@@ -122,7 +122,7 @@ bin/%.html: out/emscripten.wasm.o out/%.wasm.o out/sdl_wrapper.wasm.o $(WASM_STU
 # Builds the test suite executables from the corresponding test .o file
 # and the library .o files. The only difference from the demo build command
 # is that it doesn't link the SDL libraries.
-bin/test_suite_%: out/test_suite_%.o out/test_util.o out/sdl_wrapper.o $(STUDENT_OBJS) $(STAFF_OBJS)
+bin/test_suite_%: out/test_suite_%.o out/test_util.o $(STUDENT_OBJS) $(STAFF_OBJS)
 	$(CC) $(CFLAGS) $(LIBS) $^ -o $@
 
 # Builds the test suite executable for the student tests

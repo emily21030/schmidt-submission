@@ -79,7 +79,7 @@ const char *FREEZE_ENEMY_INFO = "f";
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
-const TTF_Font *pacifico = TTF_OpenFont("./assets/Pacifico.ttf", 12); 
+
 
 typedef struct state {
   scene_t *scene;
@@ -350,18 +350,19 @@ void initialize_puck(state_t *state) {
   }
 }
 
-SDL_Texture win_screen(char* msg) {
-  return sdl_make_text(msg, pacifico, RGB_BLACK); 
+SDL_Texture *win_screen(char* msg, TTF_Font *font) {
+  return sdl_make_text(msg, font, RGB_BLACK); 
 }
 
 void check_win(state_t *state) {
+  TTF_Font *pacifico = TTF_OpenFont("./assets/Pacifico.ttf", 12); 
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text(win_screen("Player 1 wins!"), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
-    //printf("Player 1 wins! \n");
+    sdl_render_text(win_screen("Player 1 wins!", pacifico), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
+    printf("Player 1 wins! \n");
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text(win_screen("Player 2 wins!"), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
-    //printf("Player 2 wins! \n");
+    sdl_render_text(win_screen("Player 2 wins!", pacifico), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
+    printf("Player 2 wins! \n");
     exit(0);
   }
 }
@@ -385,7 +386,6 @@ state_t *emscripten_init() {
   make_walls(state);
   initialize_players(state);
   initialize_puck(state);
-
   state->last_touched = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   state->ppg = PPG;
@@ -398,6 +398,9 @@ state_t *emscripten_init() {
 
 void emscripten_main(state_t *state) {
   sdl_clear();
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  SDL_Surface *inkcircle = IMG_Load("./assets/inkcircle.png");
+  sdl_body_image(inkcircle, puck);
   double dt = time_since_last_tick();
   check_player_1_boundary(state);
   check_player_2_boundary(state);
