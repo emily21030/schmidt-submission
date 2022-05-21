@@ -55,3 +55,12 @@ Game!!
 **BUGS:** 
 
 **RESOURCES USED:** libraries: SDL_mixer 2.0 for sound, sdl ttf, sdl image
+
+## Saturday, 5/20 11:00am - 1:15pm
+**WHO:** Roy
+
+**WHAT:** Attempted to make text rendering work. 
+
+**BUGS:** Text rendering doesn't work - flags were added as appropriate but SDL functions are supposedly undefined despite being included. 
+
+**RESOURCES USED:** SDL documentation. 

@@ -4,6 +4,10 @@
 #include "scene.h"
 #include "state.h"
 #include <stdbool.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 // Values passed to a key handler when the given arrow key is pressed
 typedef enum {
@@ -133,5 +137,13 @@ void sdl_on_key(key_handler_t handler);
  * @return the number of seconds that have elapsed
  */
 double time_since_last_tick(void);
+
+SDL_Texture *sdl_make_text(char *string, TTF_Font *font, rgb_color_t color);
+
+void sdl_render_text(SDL_Texture *textTexture, vector_t position, vector_t size);
+
+SDL_Texture *sdl_make_image(SDL_Surface *image);
+
+void sdl_body_image(SDL_Texture *image_texture, body_t *body);
 
 #endif // #ifndef __SDL_WRAPPER_H__

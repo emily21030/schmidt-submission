@@ -9,6 +9,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 const double X_SIZE = 1200.0;
 const double Y_SIZE = 800.0;
@@ -74,6 +78,8 @@ const char *FREEZE_ENEMY_INFO = "f";
 
 int PPG = 1; 
 int PPG_POWERUP = 2; 
+
+const TTF_Font *pacifico = TTF_OpenFont("./assets/Pacifico.ttf", 12); 
 
 typedef struct state {
   scene_t *scene;
@@ -344,12 +350,18 @@ void initialize_puck(state_t *state) {
   }
 }
 
+SDL_Texture win_screen(char* msg) {
+  return sdl_make_text(msg, pacifico, RGB_BLACK); 
+}
+
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
-    printf("Player 1 wins! \n");
+    sdl_render_text(win_screen("Player 1 wins!"), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
+    //printf("Player 1 wins! \n");
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    printf("Player 2 wins! \n");
+    sdl_render_text(win_screen("Player 2 wins!"), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
+    //printf("Player 2 wins! \n");
     exit(0);
   }
 }

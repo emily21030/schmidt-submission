@@ -1,6 +1,8 @@
 #include "sdl_wrapper.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -250,4 +252,36 @@ double time_since_last_tick(void) {
                           : 0.0; // return 0 the first time this is called
   last_clock = now;
   return difference;
+}
+
+SDL_Texture *sdl_make_text(char *string, TTF_Font *font, rgb_color_t color) {
+  SDL_Color textColor = {color.r * 255.0, color.g * 255.0, color.b * 255.0, 255.0};
+  SDL_Surface *textSurface = TTF_RenderText_Solid(font, string, textColor);
+  SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+  SDL_FreeSurface(textSurface);
+  return textTexture;
+}
+
+void sdl_render_text(SDL_Texture *textTexture, vector_t position, vector_t size) {
+  SDL_Rect text;
+  text.x = position.x;
+  text.y = WINDOW_HEIGHT - position.y;
+  text.w = size.x;
+  text.h = size.y;
+  SDL_RenderCopy(renderer, textTexture, NULL, &text);
+}
+
+SDL_Texture *sdl_make_image(SDL_Surface *image) {
+  SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer, image);
+  return image_texture;
+}
+
+void sdl_body_image(SDL_Texture *image_texture, body_t *body) {
+  list_t *points = body_get_shape(body);
+  SDL_Rect text;
+  text.x = (*(vector_t *)list_get(points, 3)).x;
+  text.y = WINDOW_HEIGHT - (*(vector_t *)list_get(points, 2)).y;
+  text.w = vec_subtract(*(vector_t *)list_get(points, 1), *(vector_t *)list_get(points, 0)).x; 
+  text.h = vec_subtract(*(vector_t *)list_get(points, 2), *(vector_t *)list_get(points, 1)).y; 
+  SDL_RenderCopy(renderer, image_texture, NULL, &text);
 }
