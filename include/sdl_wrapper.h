@@ -138,9 +138,7 @@ void sdl_on_key(key_handler_t handler);
  */
 double time_since_last_tick(void);
 
-SDL_Texture *sdl_make_text(char *string, TTF_Font *font, rgb_color_t color);
-
-void sdl_render_text(SDL_Texture *textTexture, vector_t position, vector_t size);
+void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position);
 
 SDL_Texture *sdl_make_image(SDL_Surface *image);
 

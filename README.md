@@ -64,3 +64,12 @@ Game!!
 **BUGS:** Text rendering doesn't work - flags were added as appropriate but SDL functions are supposedly undefined despite being included. 
 
 **RESOURCES USED:** SDL documentation. 
+
+## Saturday, 5/20 11:00am - 1:15pm
+**WHO:** Emily and Roy
+
+**WHAT:** Attempted to make text rendering APPEAR. 
+
+**BUGS:** SDL functions/libraries are recognized, but the text still does not appear in the demo.
+
+**RESOURCES USED:** SDL documentation. 

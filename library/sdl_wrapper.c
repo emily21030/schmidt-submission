@@ -254,21 +254,21 @@ double time_since_last_tick(void) {
   return difference;
 }
 
-SDL_Texture *sdl_make_text(char *string, TTF_Font *font, rgb_color_t color) {
+void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position) {
   SDL_Color textColor = {color.r * 255.0, color.g * 255.0, color.b * 255.0, 255.0};
   SDL_Surface *textSurface = TTF_RenderText_Solid(font, string, textColor);
   SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+  int text_width = textSurface->w;
+  int text_height = textSurface->h;
   SDL_FreeSurface(textSurface);
-  return textTexture;
-}
-
-void sdl_render_text(SDL_Texture *textTexture, vector_t position, vector_t size) {
   SDL_Rect text;
   text.x = position.x;
   text.y = WINDOW_HEIGHT - position.y;
-  text.w = size.x;
-  text.h = size.y;
-  SDL_RenderCopy(renderer, textTexture, NULL, &text);
+  text.w = text_width;
+  text.h = text_height;;
+  if (!SDL_RenderCopy(renderer, textTexture, NULL, &text)) {
+    SDL_GetError();
+  }
 }
 
 SDL_Texture *sdl_make_image(SDL_Surface *image) {
