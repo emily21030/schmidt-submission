@@ -83,3 +83,12 @@ Game!!
 
 **RESOURCES USED:** None
 
+## Monday, 5/23 10:00am - 11:00am, 1:30pm - 2:00pm 
+**WHO:** Roy
+
+**WHAT:** Powerups spawn, freeze works. Ready to implement more powerups. 
+
+**BUGS:** None!
+
+**RESOURCES USED:** Stackoverflow - I forgot how to make function pointers. 
+

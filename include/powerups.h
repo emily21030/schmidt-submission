@@ -19,22 +19,12 @@ const char FREEZE_ENEMY = 'f';
 const char DOUBLE_GOAL = 'g';
 
 void double_velocity(body_t *puck) {
-  time_t start = time(NULL);
-  time_t now = time(NULL); 
-  while((now - start) < 5) {
-    vector_t curr_velocity = body_get_velocity(puck); 
-    body_set_velocity(puck, vec_multiply(2, curr_velocity));
-  }
-  
+  vector_t curr_velocity = body_get_velocity(puck); 
+  body_set_velocity(puck, vec_multiply(2, curr_velocity));
 }
 
 void double_accel(body_t *last_touch) {
-  time_t start = time(NULL);
-  time_t now = time(NULL); 
-  while((now - start) < 5) {
-    body_set_velocity(last_touch, vec_multiply(2.0, body_get_velocity(last_touch))); 
-  }
-  
+  body_set_velocity(last_touch, vec_multiply(2.0, body_get_velocity(last_touch)));   
 }
 
 void half_accel(body_t *other_player) {
