@@ -56,7 +56,7 @@ Game!!
 
 **RESOURCES USED:** libraries: SDL_mixer 2.0 for sound, sdl ttf, sdl image
 
-## Saturday, 5/20 11:00am - 1:15pm
+## Saturday, 5/21 11:00am - 1:15pm
 **WHO:** Roy
 
 **WHAT:** Attempted to make text rendering work. 
@@ -65,7 +65,7 @@ Game!!
 
 **RESOURCES USED:** SDL documentation. 
 
-## Saturday, 5/20 11:00am - 1:15pm
+## Saturday, 5/21 11:00am - 1:15pm
 **WHO:** Emily and Roy
 
 **WHAT:** Attempted to make text rendering APPEAR. 
@@ -74,7 +74,7 @@ Game!!
 
 **RESOURCES USED:** SDL documentation. 
 
-## Saturday, 5/20 6:45pm - 8:15pm 
+## Sunday, 5/22 6:45pm - 8:15pm 
 **WHO:** Roy
 
 **WHAT:** Attempted to make freeze powerups spawn regularly

@@ -79,8 +79,6 @@ const char *FREEZE_ENEMY_INFO = "f";
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
-
-
 typedef struct state {
   scene_t *scene;
   body_t *last_touched;
@@ -445,7 +443,7 @@ void emscripten_main(state_t *state) {
   scene_tick(state->scene, dt);
   check_goal(state);
   check_win(state);
-  printf("numbodies: %d", (int) list_size(scene_get_body_list(state->scene))); 
+  printf("numbodies: %d \n", (int) list_size(scene_get_body_list(state->scene))); 
   sdl_render_scene(state->scene);
 }
 
