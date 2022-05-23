@@ -389,8 +389,10 @@ void freeze_enemy(state_t *state) {
 
 void add_powerup(state_t *state) {
   double corner = PADDING + WALL_THICKNESS;
-  vector_t rand_center = (vector_t) {rand_between(corner, X_TABLE - corner), rand_between(corner, Y_TABLE - corner)};
-  body_t *powerup = make_circle(0, ORANGE, (vector_t) {500.0, 250.0}, 20, FREEZE_ENEMY_INFO);
+  double randx = rand_between(corner, X_TABLE - corner);
+  double randy = rand_between(corner, Y_TABLE - corner); 
+  vector_t rand_center = (vector_t) {randx, randy};
+  body_t *powerup = make_circle(0, ORANGE, rand_center, 20, FREEZE_ENEMY_INFO);
   scene_add_body(state->scene, powerup); 
 }
 
