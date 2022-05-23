@@ -73,3 +73,13 @@ Game!!
 **BUGS:** SDL functions/libraries are recognized, but the text still does not appear in the demo.
 
 **RESOURCES USED:** SDL documentation. 
+
+## Saturday, 5/20 6:45pm - 8:15pm 
+**WHO:** Roy
+
+**WHAT:** Attempted to make freeze powerups spawn regularly
+
+**BUGS:** emscripten is bugging tf out
+
+**RESOURCES USED:** None
+

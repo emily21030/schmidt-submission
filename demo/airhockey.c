@@ -89,7 +89,12 @@ typedef struct state {
   int ppg; // points per goal
   int player_1_score;
   int player_2_score;
+  double time_passed;
 } state_t;
+
+int rand_between(int lower, int upper) {
+  return (rand() % (upper + 1 - lower)) + lower; 
+}
 
 void add_vec_ptr(list_t *shape, double x, double y) {
   vector_t v = vec_init(x, y);
@@ -350,18 +355,14 @@ void initialize_puck(state_t *state) {
   }
 }
 
-SDL_Texture *win_screen(char* msg, TTF_Font *font) {
-  return sdl_make_text(msg, font, RGB_BLACK); 
-}
-
 void check_win(state_t *state) {
   TTF_Font *pacifico = TTF_OpenFont("../assets/Pacifico.ttf", 12); 
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text(win_screen("Player 1 wins!", pacifico), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
+    sdl_render_text("Player 1 wins!", pacifico, RGB_BLACK, (vector_t){600.0, 400.0}); 
     printf("Player 1 wins! \n");
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text(win_screen("Player 2 wins!", pacifico), (vector_t) {600.0, 400.0}, (vector_t) {400.0, 200.0});
+    sdl_render_text("Player 2 wins!", pacifico, RGB_BLACK, (vector_t){600.0, 400.0}); 
     printf("Player 2 wins! \n");
     exit(0);
   }
@@ -378,6 +379,34 @@ void check_goal(state_t *state) {
   }
 }
 
+void freeze_enemy(state_t *state) {
+  time_t start = time(NULL);
+  time_t now = time(NULL); 
+  while((now - start) < 5) {
+    body_set_velocity(state->other_player, (vector_t) {0, 0});
+  }
+}
+
+void add_powerup(state_t *state) {
+  double corner = PADDING + WALL_THICKNESS;
+  vector_t rand_center = (vector_t) {rand_between(corner, X_TABLE - corner), rand_between(corner, Y_TABLE - corner)};
+  body_t *powerup = make_circle(0, ORANGE, (vector_t) {500.0, 250.0}, 20, FREEZE_ENEMY_INFO);
+  scene_add_body(state->scene, powerup); 
+}
+
+void powerup_collide(state_t *state) {
+  list_t *powerups = get_bodies_by_type(state->scene, FREEZE_ENEMY_INFO);
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
+  for(int i = 0; i < list_size(powerups); i++) {
+    body_t *powerup = list_get(powerups, i); 
+    if((fabs(body_get_centroid(powerup).x - body_get_centroid(puck).x) < PUCK_RADIUS) && (fabs(body_get_centroid(powerup).y - body_get_centroid(puck).y) < PUCK_RADIUS)) {
+      freeze_enemy(state);
+      state->powerup_active = true; 
+      body_remove(powerup); 
+    }
+  }
+}
+
 state_t *emscripten_init() {
   srand(time(NULL));
   sdl_init(VEC_ZERO, (vector_t){X_SIZE, Y_SIZE});
@@ -386,28 +415,35 @@ state_t *emscripten_init() {
   make_walls(state);
   initialize_players(state);
   initialize_puck(state);
+  add_powerup(state); 
   state->last_touched = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   state->ppg = PPG;
   state->powerup_active = NULL;
   state->player_1_score = 0;
   state->player_2_score = 0;
+  state->time_passed = 0.0; 
   sdl_on_key((key_handler_t)key_handler_func);
   return state;
 }
 
 void emscripten_main(state_t *state) {
   sdl_clear();
-  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
-  SDL_Surface *inkcircle = IMG_Load("./assets/inkcircle.png");
-  SDL_Texture *inkcircle_texture = sdl_make_image(inkcircle);
-  sdl_body_image(inkcircle_texture, puck);
   double dt = time_since_last_tick();
+  if (dt > 0) {
+    state->time_passed += 1;
+    if (state->time_passed >= 100) {
+      add_powerup(state);
+      state->time_passed = 0.0;
+    }
+  }
+  powerup_collide(state);
   check_player_1_boundary(state);
   check_player_2_boundary(state);
   scene_tick(state->scene, dt);
   check_goal(state);
   check_win(state);
+  printf("numbodies: %d", (int) list_size(scene_get_body_list(state->scene))); 
   sdl_render_scene(state->scene);
 }
 

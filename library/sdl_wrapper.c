@@ -269,6 +269,7 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   if (!SDL_RenderCopy(renderer, textTexture, NULL, &text)) {
     SDL_GetError();
   }
+  SDL_RenderCopy(renderer, textTexture, NULL, &text);
 }
 
 SDL_Texture *sdl_make_image(SDL_Surface *image) {
