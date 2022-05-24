@@ -92,3 +92,12 @@ Game!!
 
 **RESOURCES USED:** Stackoverflow - I forgot how to make function pointers. 
 
+## Monday, 5/23 7:00pm - 8:30pm
+
+**WHO:** Roy
+
+**WHAT:** Powerups spawn. Randomized powerup spawning and implementation works! 
+
+**BUGS:** Balancing needs some work... I think double accel and double velocity both enable bodies to go mach 10 or something...
+
+**RESOURCES USED:** None. 
