@@ -51,6 +51,7 @@ const vector_t RIGHT_ACCEL = {100, 0};
 const double MAX_VEL = 400;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
+const int POWERUP_RADIUS = 20; 
 const int CIRCLE_SIDES = 40;
 const int WIN_THRESHOLD = 7;
 
@@ -79,15 +80,20 @@ const char *FREEZE_ENEMY_INFO = "f";
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
+typedef void (*Powerup_func)(state_t *state); 
+
 typedef struct state {
   scene_t *scene;
   body_t *last_touched;
   body_t *other_player;
   char *powerup_active;
+  double powerup_time; 
+  body_t *powerup_affects;
   int ppg; // points per goal
   int player_1_score;
   int player_2_score;
   double time_passed;
+  Powerup_func powerup; 
 } state_t;
 
 int rand_between(int lower, int upper) {
@@ -389,6 +395,24 @@ void initialize_puck(state_t *state) {
   }
 }
 
+char* rand_powerup() {
+  int num = rand_between(0, 5); 
+  switch(num) {
+    case 0:
+      return X2_PUCK_VEL_INFO;
+    case 1:
+      return X2_NEXT_GOAL_INFO;
+    case 2: 
+      return X2_PLAYER_ACC_INFO;
+    case 3:
+      return HALF_ENEMY_ACC_INFO;
+    case 4: 
+      return FREEZE_ENEMY_INFO;
+    default:
+      return FREEZE_ENEMY_INFO; 
+  }
+}
+
 void check_win(state_t *state) {
   TTF_Font *pacifico = TTF_OpenFont("../assets/Pacifico.ttf", 12); 
   if (state->player_1_score >= WIN_THRESHOLD) {
@@ -405,43 +429,181 @@ void check_win(state_t *state) {
 void check_goal(state_t *state) {
   body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
   if (body_get_centroid(puck).x > X_SIZE - PADDING - (WALL_THICKNESS / 2)) {
-    state->player_1_score++;
+    state->player_1_score = state->player_1_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
-    body_set_velocity(puck, VEC_ZERO);
+    printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
-    state->player_2_score++;
+    state->player_2_score = state->player_2_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
-    body_set_velocity(puck, VEC_ZERO);
+    printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   }
+}
+
+void double_velocity(state_t *state) {
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  state->powerup_affects = puck; 
+  vector_t curr_velocity = body_get_velocity(puck); 
+  body_set_velocity(puck, vec_multiply(2.0, curr_velocity));
+  
+}
+
+void double_accel(state_t *state) {
+  body_t *last_touched = state->last_touched; 
+  state->powerup_affects = last_touched; 
+  body_set_velocity(last_touched, vec_multiply(2.0, body_get_velocity(last_touched)));   
+  
+}
+
+void half_accel(state_t *state) {
+  body_t *other_player = state->other_player; 
+  state->powerup_affects = other_player; 
+  body_set_velocity(other_player, vec_multiply(0.5, body_get_velocity(other_player)));   
 }
 
 void freeze_enemy(state_t *state) {
-  time_t start = time(NULL);
-  time_t now = time(NULL); 
-  while((now - start) < 5) {
-    body_set_velocity(state->other_player, (vector_t) {0, 0});
+  state->powerup_affects = state->other_player;
+  body_set_velocity(state->other_player, (vector_t) {0, 0});
+}
+
+void double_goal(state_t *state) {
+  state->ppg = PPG_POWERUP; 
+}
+
+void add_powerup(state_t *state, char* powerup) {
+  double max_x = X_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
+  double min_x = POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
+  double rand_x = rand_between(min_x, max_x);
+  double max_y = Y_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
+  double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
+  double rand_y = rand_between(min_y, max_y); 
+  vector_t rand_center = (vector_t) {rand_x, rand_y};
+  rgb_color_t powerup_color; 
+  switch(*powerup) {
+    case X2_PUCK_VEL_INFO_C:
+      powerup_color = RED;
+      break;
+    case X2_NEXT_GOAL_INFO_C:
+      powerup_color = ORANGE;
+      break;
+    case X2_PLAYER_ACC_INFO_C:
+      powerup_color = YELLOW;
+      break;
+    case HALF_ENEMY_ACC_INFO_C:
+      powerup_color = GREEN_2;
+      break;
+    case FREEZE_ENEMY_INFO_C:
+      powerup_color = INDIGO;
+      break;
+    default:
+      powerup_color = BLUE;
+      break; 
+  }
+  body_t *powerup_body = make_circle(10, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
+  scene_add_body(state->scene, powerup_body); 
+}
+
+list_t *get_all_powerups(state_t *state) {
+  list_t *x2pucks = get_bodies_by_type(state->scene, X2_PUCK_VEL_INFO);
+  list_t *x2goals = get_bodies_by_type(state->scene, X2_NEXT_GOAL_INFO);
+  list_t *x2acc = get_bodies_by_type(state->scene, X2_PLAYER_ACC_INFO);
+  list_t *h2acc = get_bodies_by_type(state->scene, HALF_ENEMY_ACC_INFO);
+  list_t *freeze = get_bodies_by_type(state->scene, FREEZE_ENEMY_INFO);
+  list_t *powerups = list_init(1, NULL);
+  for(int i = 0; i < list_size(x2pucks); i++) {
+    list_add(powerups, list_get(x2pucks, i));
+  }
+  for(int i = 0; i < list_size(x2goals); i++) {
+    list_add(powerups, list_get(x2goals, i));
+  }
+  for(int i = 0; i < list_size(x2acc); i++) {
+    list_add(powerups, list_get(x2acc, i));
+  }
+  for(int i = 0; i < list_size(h2acc); i++) {
+    list_add(powerups, list_get(h2acc, i));
+  }
+  for(int i = 0; i < list_size(freeze); i++) {
+    list_add(powerups, list_get(freeze, i));
+  }
+  return powerups; 
+}
+
+Powerup_func get_correct_powerup(char *info, state_t *state) {
+  switch(*info) {
+    case X2_PUCK_VEL_INFO_C:
+      printf("DOUBLE VELOCITY \n");
+      return double_velocity;
+    case X2_PLAYER_ACC_INFO_C:
+      printf("DOUBLE ACCEL \n");
+      return double_accel;
+    case X2_NEXT_GOAL_INFO_C:
+      printf("DOUBLE GOAL \n");
+      return double_goal;
+    case HALF_ENEMY_ACC_INFO_C:
+      printf("HALF ACCEL \n");
+      return half_accel;
+    case FREEZE_ENEMY_INFO_C:
+      printf("ENEMY FROZEN \n");
+      return freeze_enemy;
+    default:
+      printf("ENEMY FROZEN \n");
+      return freeze_enemy;
+  }
+  printf("ENEMY FROZEN \n");
+  return freeze_enemy;
+}
+
+void powerup_collide(state_t *state) { 
+  list_t *powerups = get_all_powerups(state);
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
+  for(int i = 0; i < list_size(powerups); i++) {
+    body_t *powerup_body = list_get(powerups, i); 
+    if((fabs(body_get_centroid(powerup_body).x - body_get_centroid(puck).x) < PUCK_RADIUS) && (fabs(body_get_centroid(powerup_body).y - body_get_centroid(puck).y) < PUCK_RADIUS)) {
+      state->powerup = get_correct_powerup(body_get_info(powerup_body), state);
+      state->powerup_active = body_get_info(powerup_body); 
+      body_remove(powerup_body); 
+    }
   }
 }
 
-void add_powerup(state_t *state) {
-  double corner = PADDING + WALL_THICKNESS;
-  double randx = rand_between(corner, X_TABLE - corner);
-  double randy = rand_between(corner, Y_TABLE - corner); 
-  vector_t rand_center = (vector_t) {randx, randy};
-  body_t *powerup = make_circle(0, ORANGE, rand_center, 20, FREEZE_ENEMY_INFO);
-  scene_add_body(state->scene, powerup); 
+void change_player_designations(state_t *state) {
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0); 
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0); 
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
+  collision_info_t collided1 = find_collision(body_get_shape(player1), body_get_shape(puck));
+  collision_info_t collided2 = find_collision(body_get_shape(player2), body_get_shape(puck)); 
+  if(collided1.collided) {
+    state->last_touched = player1;
+    state->other_player = player2; 
+  }
+  else if(collided2.collided) {
+    state->last_touched = player2;
+    state->other_player = player1; 
+  }
 }
 
-void powerup_collide(state_t *state) {
-  list_t *powerups = get_bodies_by_type(state->scene, FREEZE_ENEMY_INFO);
-  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
-  for(int i = 0; i < list_size(powerups); i++) {
-    body_t *powerup = list_get(powerups, i); 
-    if((fabs(body_get_centroid(powerup).x - body_get_centroid(puck).x) < PUCK_RADIUS) && (fabs(body_get_centroid(powerup).y - body_get_centroid(puck).y) < PUCK_RADIUS)) {
-      freeze_enemy(state);
-      state->powerup_active = true; 
-      body_remove(powerup); 
+void speed_limit(state_t *state) {
+  body_t *affected = state->powerup_affects; 
+  if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0 || strcmp(state->powerup_active, X2_PUCK_VEL_INFO) == 0) {
+    double checkx = body_get_velocity(affected).x;
+    if(body_get_velocity(affected).x > 800.0) {
+      checkx = 800.0; 
     }
+    double checky = body_get_velocity(affected).y;
+    if(body_get_velocity(affected).y > 800.0) {
+      checky = 800.0;
+    }
+    body_set_velocity(affected, (vector_t) {checkx, checky}); 
+  }
+  else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
+    double checkx = body_get_velocity(affected).x;
+    if(body_get_velocity(affected).x > 200.0) {
+      checkx = 200.0; 
+    }
+    double checky = body_get_velocity(affected).y;
+    if(body_get_velocity(affected).y > 200.0) {
+      checky = 200.0;
+    }
+    body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
 }
 
@@ -453,11 +615,13 @@ state_t *emscripten_init() {
   make_walls(state);
   initialize_players(state);
   initialize_puck(state);
-  add_powerup(state); 
   state->last_touched = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   state->ppg = PPG;
   state->powerup_active = NULL;
+  state->powerup_time = 0.0;
+  state->powerup_affects = NULL; 
+  state->powerup = NULL; 
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
@@ -470,18 +634,36 @@ void emscripten_main(state_t *state) {
   double dt = time_since_last_tick();
   if (dt > 0) {
     state->time_passed += 1;
-    if (state->time_passed >= 100) {
-      add_powerup(state);
+    if (state->time_passed >= 500 && list_size(scene_get_body_list(state->scene)) <= 12) {
+      add_powerup(state, rand_powerup()); 
       state->time_passed = 0.0;
     }
   }
+  if (state->powerup_active) {
+    state->powerup_time += 1;
+    if(state->powerup_time <= 500) {
+      (*state).powerup(state); 
+    }
+    else {
+      if(state->powerup_active == X2_NEXT_GOAL_INFO) {
+        state->ppg = PPG; 
+      }
+      state->powerup_active = NULL;
+      state->powerup_affects = NULL;
+      state->powerup_time = 0.0; 
+      printf("Powerup deactivated! \n");
+    }
+  }
+  speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);
   check_player_2_boundary(state);
+  change_player_designations(state);
   scene_tick(state->scene, dt);
+  speed_limit(state);
   check_goal(state);
   check_win(state);
-  printf("numbodies: %d \n", (int) list_size(scene_get_body_list(state->scene))); 
+  //printf("numbodies: %d \n", (int) list_size(scene_get_body_list(state->scene))); 
   sdl_render_scene(state->scene);
 }
 

@@ -83,3 +83,22 @@ Game!!
 
 **RESOURCES USED:** None
 
+## Monday, 5/23 10:00am - 11:00am, 1:30pm - 2:00pm 
+**WHO:** Roy
+
+**WHAT:** Powerups spawn, freeze works. Ready to implement more powerups. 
+
+**BUGS:** None!
+
+**RESOURCES USED:** Stackoverflow - I forgot how to make function pointers. 
+
+## Monday, 5/23 7:00pm - 8:30pm, 9:30pm - 10:30pm
+
+**WHO:** Roy
+
+**WHAT:** Powerups spawn. Randomized powerup spawning and implementation works! 
+
+**BUGS:** Balancing needs some work... I think double accel and double velocity both enable bodies to go mach 10 or something... (9:30-10:30) no more mach 10! No more bugs currently. 
+
+**RESOURCES USED:** None. 
+
