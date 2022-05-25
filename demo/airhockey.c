@@ -44,10 +44,10 @@ const rgb_color_t PINK = {1.0, 0.0, 0.5};
 
 const double PADDLE_MASS = 5.0;
 const double PADDLE_RADIUS = 40;
-const vector_t UP_ACCEL = {0, 200};
-const vector_t DOWN_ACCEL = {0, -200};
-const vector_t LEFT_ACCEL = {-200, 0};
-const vector_t RIGHT_ACCEL = {200, 0};
+const vector_t UP_ACCEL = {0, 100};
+const vector_t DOWN_ACCEL = {0, -100};
+const vector_t LEFT_ACCEL = {-100, 0};
+const vector_t RIGHT_ACCEL = {100, 0};
 const double MAX_VEL = 400;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
@@ -217,6 +217,42 @@ void key_handler_func(state_t *state, char key_pressed,
   }
 }
 
+void updated_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  if (keyboard_states[SDL_SCANCODE_W]) {
+    key_handler_func_helper(dt, player_1, UP_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_A]) {
+    key_handler_func_helper(dt, player_1, LEFT_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_S]) {
+    key_handler_func_helper(dt, player_1, DOWN_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_D]) {
+    key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_UP]) {
+    key_handler_func_helper(dt, player_2, UP_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_LEFT]) {
+    key_handler_func_helper(dt, player_2, LEFT_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_DOWN]) {
+    key_handler_func_helper(dt, player_2, DOWN_ACCEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_RIGHT]) {
+    key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
+  }
+  if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
+    body_set_velocity(player_1, VEC_ZERO);
+  }
+  if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
+    body_set_velocity(player_2, VEC_ZERO);
+  }
+}
+
 void check_player_1_boundary(state_t *state) {
   body_t *player = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   vector_t curr_centroid = body_get_centroid(player);
@@ -371,9 +407,11 @@ void check_goal(state_t *state) {
   if (body_get_centroid(puck).x > X_SIZE - PADDING - (WALL_THICKNESS / 2)) {
     state->player_1_score++;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
+    body_set_velocity(puck, VEC_ZERO);
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
     state->player_2_score++;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
+    body_set_velocity(puck, VEC_ZERO);
   }
 }
 
@@ -423,7 +461,7 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
-  sdl_on_key((key_handler_t)key_handler_func);
+  sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }
 
