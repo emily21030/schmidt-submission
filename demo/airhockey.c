@@ -578,7 +578,7 @@ void emscripten_main(state_t *state) {
   double dt = time_since_last_tick();
   if (dt > 0) {
     state->time_passed += 1;
-    if (state->time_passed >= 500 && list_size(scene_get_body_list(state->scene)) <= 12) {
+    if (state->time_passed >= 500 && list_size(get_all_powerups(state)) < 1) { //adjust this for powerup cap
       add_powerup(state, rand_powerup()); 
       state->time_passed = 0.0;
     }

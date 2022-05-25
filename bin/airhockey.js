@@ -204,7 +204,7 @@ Module['FS_createPath']("/", "assets", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/assets/inkcircle.png", "start": 0, "end": 413083}, {"filename": "/assets/Pacifico.ttf", "start": 413083, "end": 488651}], "remote_package_size": 488651, "package_uuid": "cff4703c-be13-428a-8cb4-e881908cbe44"});
+    loadPackage({"files": [{"filename": "/assets/inkcircle.png", "start": 0, "end": 413083}, {"filename": "/assets/Pacifico.ttf", "start": 413083, "end": 488651}], "remote_package_size": 488651, "package_uuid": "d9a482ce-91b2-49a9-b31a-8a77934b570e"});
 
   })();
 
