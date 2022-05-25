@@ -102,3 +102,12 @@ Game!!
 
 **RESOURCES USED:** None. 
 
+## Tuesday, 5/24 9:00pm - 10:00pm
+
+**WHO:** Kaushik
+
+**WHAT:** Rewrote key handler using SDL_GetKeyboardState to accept multiple simultaneous key inputs and account for diagonal motion!
+
+**BUGS:** The handler is a bit laggy... not sure how to resolve this
+
+**RESOURCES USED:** SDL documentation

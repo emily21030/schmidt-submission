@@ -431,10 +431,12 @@ void check_goal(state_t *state) {
   if (body_get_centroid(puck).x > X_SIZE - PADDING - (WALL_THICKNESS / 2)) {
     state->player_1_score = state->player_1_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
+    body_set_velocity(puck, VEC_ZERO);
     printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
     state->player_2_score = state->player_2_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
+    body_set_velocity(puck, VEC_ZERO);
     printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   }
 }
