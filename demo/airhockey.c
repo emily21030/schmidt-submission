@@ -48,12 +48,14 @@ const vector_t UP_ACCEL = {0, 100};
 const vector_t DOWN_ACCEL = {0, -100};
 const vector_t LEFT_ACCEL = {-100, 0};
 const vector_t RIGHT_ACCEL = {100, 0};
-const double MAX_VEL = 400;
+const double MIN_VEL = 150.0;
+const double MAX_VEL = 400.0;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int POWERUP_RADIUS = 20; 
 const int CIRCLE_SIDES = 40;
 const int WIN_THRESHOLD = 7;
+const int MAX_NUM_POWERUPS = 2;
 
 const char PLAYER_1_INFO_C = '1';
 const char PLAYER_2_INFO_C = '2';
@@ -150,77 +152,15 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
 }
 
 void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
+  if (sqrt(vec_dot(body_get_velocity(body), body_get_velocity(body))) == 0) {
+    body_set_velocity(body, vec_multiply(MIN_VEL, unit_vector(acceleration)));
+    return;
+  }
   vector_t new_velocity = vec_add(body_get_velocity(body), vec_multiply(dt, acceleration));
-  if (sqrt(vec_dot(new_velocity, new_velocity) > MAX_VEL)) {
+  if (sqrt(vec_dot(new_velocity, new_velocity)) > MAX_VEL) {
     new_velocity = vec_multiply(MAX_VEL, unit_vector(new_velocity));
-  }
+  } 
   body_set_velocity(body, new_velocity);  
-}
-
-void key_handler_func(state_t *state, char key_pressed,
-                      key_event_type_t event_type, double dt) {
-  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  if (event_type == KEY_PRESSED) {
-    switch (key_pressed) {
-    case D_KEY:
-      key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
-      break;
-    case A_KEY:
-      key_handler_func_helper(dt, player_1, LEFT_ACCEL);
-      break;
-    case W_KEY:
-      key_handler_func_helper(dt, player_1, UP_ACCEL);
-      break;
-    case S_KEY:
-      key_handler_func_helper(dt, player_1, DOWN_ACCEL);
-      break;
-    case RIGHT_ARROW:
-      key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
-      break;
-    case LEFT_ARROW:
-      key_handler_func_helper(dt, player_2, LEFT_ACCEL);
-      break;
-    case UP_ARROW:
-      key_handler_func_helper(dt, player_2, UP_ACCEL);
-      break;
-    case DOWN_ARROW:
-      key_handler_func_helper(dt, player_2, DOWN_ACCEL);
-      break;
-    default:
-      break;
-    } 
-  // } else if (event_type == KEY_RELEASED) {
-  //   switch (key_pressed) {
-  //   case D_KEY:
-  //     key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
-  //     break;
-  //   case A_KEY:
-  //     key_handler_func_helper(dt, player_1, LEFT_ACCEL);
-  //     break;
-  //   case W_KEY:
-  //     key_handler_func_helper(dt, player_1, UP_ACCEL);
-  //     break;
-  //   case S_KEY:
-  //     key_handler_func_helper(dt, player_1, DOWN_ACCEL);
-  //     break;
-  //   case RIGHT_ARROW:
-  //     key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
-  //     break;
-  //   case LEFT_ARROW:
-  //     key_handler_func_helper(dt, player_2, LEFT_ACCEL);
-  //     break;
-  //   case UP_ARROW:
-  //     key_handler_func_helper(dt, player_2, UP_ACCEL);
-  //     break;
-  //   case DOWN_ARROW:
-  //     key_handler_func_helper(dt, player_2, DOWN_ACCEL);
-  //     break;
-  //   default:
-  //     break;
-  //   } 
-    
-  }
 }
 
 void updated_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
@@ -471,39 +411,6 @@ void double_goal(state_t *state) {
   state->ppg = PPG_POWERUP; 
 }
 
-void add_powerup(state_t *state, char* powerup) {
-  double max_x = X_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
-  double min_x = POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
-  double rand_x = rand_between(min_x, max_x);
-  double max_y = Y_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
-  double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
-  double rand_y = rand_between(min_y, max_y); 
-  vector_t rand_center = (vector_t) {rand_x, rand_y};
-  rgb_color_t powerup_color; 
-  switch(*powerup) {
-    case X2_PUCK_VEL_INFO_C:
-      powerup_color = RED;
-      break;
-    case X2_NEXT_GOAL_INFO_C:
-      powerup_color = ORANGE;
-      break;
-    case X2_PLAYER_ACC_INFO_C:
-      powerup_color = YELLOW;
-      break;
-    case HALF_ENEMY_ACC_INFO_C:
-      powerup_color = GREEN_2;
-      break;
-    case FREEZE_ENEMY_INFO_C:
-      powerup_color = INDIGO;
-      break;
-    default:
-      powerup_color = BLUE;
-      break; 
-  }
-  body_t *powerup_body = make_circle(10, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
-  scene_add_body(state->scene, powerup_body); 
-}
-
 list_t *get_all_powerups(state_t *state) {
   list_t *x2pucks = get_bodies_by_type(state->scene, X2_PUCK_VEL_INFO);
   list_t *x2goals = get_bodies_by_type(state->scene, X2_NEXT_GOAL_INFO);
@@ -527,6 +434,41 @@ list_t *get_all_powerups(state_t *state) {
     list_add(powerups, list_get(freeze, i));
   }
   return powerups; 
+}
+
+void add_powerup(state_t *state, char* powerup) {
+  if (list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS) {
+    double max_x = X_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
+    double min_x = POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
+    double rand_x = rand_between(min_x, max_x);
+    double max_y = Y_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
+    double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
+    double rand_y = rand_between(min_y, max_y); 
+    vector_t rand_center = (vector_t) {rand_x, rand_y};
+    rgb_color_t powerup_color; 
+    switch(*powerup) {
+      case X2_PUCK_VEL_INFO_C:
+        powerup_color = RED;
+        break;
+      case X2_NEXT_GOAL_INFO_C:
+        powerup_color = ORANGE;
+        break;
+      case X2_PLAYER_ACC_INFO_C:
+        powerup_color = YELLOW;
+        break;
+      case HALF_ENEMY_ACC_INFO_C:
+        powerup_color = GREEN_2;
+        break;
+      case FREEZE_ENEMY_INFO_C:
+        powerup_color = INDIGO;
+        break;
+      default:
+        powerup_color = BLUE;
+        break; 
+    }
+    body_t *powerup_body = make_circle(10, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
+    scene_add_body(state->scene, powerup_body);   
+  }
 }
 
 Powerup_func get_correct_powerup(char *info, state_t *state) {

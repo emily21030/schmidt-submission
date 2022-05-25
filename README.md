@@ -111,3 +111,13 @@ Game!!
 **BUGS:** The handler is a bit laggy... not sure how to resolve this
 
 **RESOURCES USED:** SDL documentation
+
+## Wednesday, 5/24 2:00am - 3:00am
+
+**WHO:** Avi 
+
+**WHAT:** Resolved the laggy handler. Added a cap on the amount of power-ups that appear on the screen at once. 
+
+**BUGS:** Acceleration + min velocity might need tweaking. 
+
+**RESOURCES USED:** 
