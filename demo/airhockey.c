@@ -18,7 +18,6 @@ const double X_SIZE = 1200.0;
 const double Y_SIZE = 800.0;
 const double X_TABLE = 1000.0;
 const double Y_TABLE = 500.0;
-// const double X_SCOREBOARD = 
 const double Y_SCOREBOARD = 200.0;
 const double PADDING = 100.0;
 const double X_ORIGIN = 0;
@@ -53,9 +52,11 @@ const double MAX_VEL = 400.0;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int POWERUP_RADIUS = 20; 
+const int POWERUP_MASS = 10;
 const int CIRCLE_SIDES = 40;
 const int WIN_THRESHOLD = 7;
-const int MAX_NUM_POWERUPS = 2;
+const int MAX_NUM_POWERUPS = 1;
+const double POWERUP_TIME = 500.0;
 
 const char PLAYER_1_INFO_C = '1';
 const char PLAYER_2_INFO_C = '2';
@@ -82,7 +83,7 @@ const char *FREEZE_ENEMY_INFO = "f";
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
-typedef void (*Powerup_func)(state_t *state); 
+typedef void (*powerup_func)(state_t *state); 
 
 typedef struct state {
   scene_t *scene;
@@ -95,7 +96,7 @@ typedef struct state {
   int player_1_score;
   int player_2_score;
   double time_passed;
-  Powerup_func powerup; 
+  powerup_func powerup; 
 } state_t;
 
 int rand_between(int lower, int upper) {
@@ -418,60 +419,58 @@ list_t *get_all_powerups(state_t *state) {
   list_t *h2acc = get_bodies_by_type(state->scene, HALF_ENEMY_ACC_INFO);
   list_t *freeze = get_bodies_by_type(state->scene, FREEZE_ENEMY_INFO);
   list_t *powerups = list_init(1, NULL);
-  for(int i = 0; i < list_size(x2pucks); i++) {
+  for (int i = 0; i < list_size(x2pucks); i++) {
     list_add(powerups, list_get(x2pucks, i));
   }
-  for(int i = 0; i < list_size(x2goals); i++) {
+  for (int i = 0; i < list_size(x2goals); i++) {
     list_add(powerups, list_get(x2goals, i));
   }
-  for(int i = 0; i < list_size(x2acc); i++) {
+  for (int i = 0; i < list_size(x2acc); i++) {
     list_add(powerups, list_get(x2acc, i));
   }
-  for(int i = 0; i < list_size(h2acc); i++) {
+  for (int i = 0; i < list_size(h2acc); i++) {
     list_add(powerups, list_get(h2acc, i));
   }
-  for(int i = 0; i < list_size(freeze); i++) {
+  for (int i = 0; i < list_size(freeze); i++) {
     list_add(powerups, list_get(freeze, i));
   }
   return powerups; 
 }
 
 void add_powerup(state_t *state, char* powerup) {
-  if (list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS) {
-    double max_x = X_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
-    double min_x = POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
-    double rand_x = rand_between(min_x, max_x);
-    double max_y = Y_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
-    double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
-    double rand_y = rand_between(min_y, max_y); 
-    vector_t rand_center = (vector_t) {rand_x, rand_y};
-    rgb_color_t powerup_color; 
-    switch(*powerup) {
-      case X2_PUCK_VEL_INFO_C:
-        powerup_color = RED;
-        break;
-      case X2_NEXT_GOAL_INFO_C:
-        powerup_color = ORANGE;
-        break;
-      case X2_PLAYER_ACC_INFO_C:
-        powerup_color = YELLOW;
-        break;
-      case HALF_ENEMY_ACC_INFO_C:
-        powerup_color = GREEN_2;
-        break;
-      case FREEZE_ENEMY_INFO_C:
-        powerup_color = INDIGO;
-        break;
-      default:
-        powerup_color = BLUE;
-        break; 
-    }
-    body_t *powerup_body = make_circle(10, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
-    scene_add_body(state->scene, powerup_body);   
+  double max_x = X_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
+  double min_x = POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
+  double rand_x = rand_between(min_x, max_x);
+  double max_y = Y_TABLE + PADDING - WALL_THICKNESS - POWERUP_RADIUS; 
+  double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
+  double rand_y = rand_between(min_y, max_y); 
+  vector_t rand_center = (vector_t) {rand_x, rand_y};
+  rgb_color_t powerup_color; 
+  switch(*powerup) {
+    case X2_PUCK_VEL_INFO_C:
+      powerup_color = RED;
+      break;
+    case X2_NEXT_GOAL_INFO_C:
+      powerup_color = ORANGE;
+      break;
+    case X2_PLAYER_ACC_INFO_C:
+      powerup_color = YELLOW;
+      break;
+    case HALF_ENEMY_ACC_INFO_C:
+      powerup_color = GREEN_2;
+      break;
+    case FREEZE_ENEMY_INFO_C:
+      powerup_color = INDIGO;
+      break;
+    default:
+      powerup_color = BLUE;
+      break; 
   }
+  body_t *powerup_body = make_circle(POWERUP_MASS, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
+  scene_add_body(state->scene, powerup_body);   
 }
 
-Powerup_func get_correct_powerup(char *info, state_t *state) {
+powerup_func get_correct_powerup(char *info, state_t *state) {
   switch(*info) {
     case X2_PUCK_VEL_INFO_C:
       printf("DOUBLE VELOCITY \n");
@@ -578,14 +577,14 @@ void emscripten_main(state_t *state) {
   double dt = time_since_last_tick();
   if (dt > 0) {
     state->time_passed += 1;
-    if (state->time_passed >= 500 && list_size(get_all_powerups(state)) < 1) { //adjust this for powerup cap
+    if (state->time_passed >= POWERUP_TIME && list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS && state->powerup_active == NULL) { //adjust this for powerup cap
       add_powerup(state, rand_powerup()); 
       state->time_passed = 0.0;
     }
   }
   if (state->powerup_active) {
     state->powerup_time += 1;
-    if(state->powerup_time <= 500) {
+    if(state->powerup_time <= POWERUP_TIME) {
       (*state).powerup(state); 
     }
     else {
