@@ -598,6 +598,9 @@ void emscripten_main(state_t *state) {
       printf("Powerup deactivated! \n");
     }
   }
+  TTF_Font *pacifico = TTF_OpenFont("./assets/Pacifico.ttf", 65); // not recognized, for whatever reason. 
+  printf("%s", TTF_GetError()); 
+  sdl_render_text("THIS IS TEXT", pacifico, RGB_BLACK, (vector_t) {200, 200}); 
   speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);

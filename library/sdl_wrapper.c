@@ -126,6 +126,7 @@ void sdl_init(vector_t min, vector_t max) {
   center = vec_multiply(0.5, vec_add(min, max));
   max_diff = vec_subtract(max, center);
   SDL_Init(SDL_INIT_EVERYTHING);
+  TTF_Init(); 
   window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT,
                             SDL_WINDOW_RESIZABLE);
@@ -139,6 +140,7 @@ bool sdl_is_done(void *state) {
     switch (event->type) {
     case SDL_QUIT:
       free(event);
+      TTF_Quit(); 
       return true;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
@@ -255,20 +257,21 @@ double time_since_last_tick(void) {
 }
 
 void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position) {
-  SDL_Color textColor = {color.r * 255.0, color.g * 255.0, color.b * 255.0, 255.0};
-  SDL_Surface *textSurface = TTF_RenderText_Solid(font, string, textColor);
+  SDL_Color textColor = {color.r * 255.0, color.g * 255.0, color.b * 255.0};
+  SDL_Surface *textSurface = TTF_RenderText_Solid(font, string, textColor); //
   SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
   int text_width = textSurface->w;
   int text_height = textSurface->h;
-  SDL_FreeSurface(textSurface);
+  //SDL_FreeSurface(textSurface);
   SDL_Rect text;
-  text.x = position.x;
+  text.x = 1500;
+  text.y = 1500;
+  text.w = 500;
+  text.h = 500;
+  /*text.x = position.x;
   text.y = WINDOW_HEIGHT - position.y;
   text.w = text_width;
-  text.h = text_height;;
-  if (!SDL_RenderCopy(renderer, textTexture, NULL, &text)) {
-    SDL_GetError();
-  }
+  text.h = text_height;*/
   SDL_RenderCopy(renderer, textTexture, NULL, &text);
 }
 
