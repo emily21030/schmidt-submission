@@ -131,3 +131,13 @@ Game!!
 **BUGS:** The path for the font is not recognized, and "SDL not built with thread support, apparently". 
 
 **RESOURCES USED:** StackOverFlow. 
+
+## Thursday, 5/26 10pm - 11:30pm
+
+**WHO:** Roy 
+
+**WHAT:** Trying to implement text rendering. Lots of failed debugging. 
+
+**BUGS:** The path for the font is not recognized, and "SDL not built with thread support, apparently". 
+
+**RESOURCES USED:** None. No responses from TAs, either.  

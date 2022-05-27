@@ -83,6 +83,8 @@ const char *FREEZE_ENEMY_INFO = "f";
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
+TTF_Font *PACIFICO;
+
 typedef void (*powerup_func)(state_t *state); 
 
 typedef struct state {
@@ -355,13 +357,12 @@ char* rand_powerup() {
 }
 
 void check_win(state_t *state) {
-  TTF_Font *pacifico = TTF_OpenFont("../assets/Pacifico.ttf", 12); 
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 1 wins!", pacifico, RGB_BLACK, (vector_t){600.0, 400.0}); 
+    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
     printf("Player 1 wins! \n");
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 2 wins!", pacifico, RGB_BLACK, (vector_t){600.0, 400.0}); 
+    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
     printf("Player 2 wins! \n");
     exit(0);
   }
@@ -568,12 +569,12 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
+  PACIFICO = TTF_OpenFont("./assets/Pacifico.ttf", 65); // not recognized, for whatever reason. 
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }
 
 void emscripten_main(state_t *state) {
-  sdl_clear();
   double dt = time_since_last_tick();
   if (dt > 0) {
     state->time_passed += 1;
@@ -597,9 +598,7 @@ void emscripten_main(state_t *state) {
       printf("Powerup deactivated! \n");
     }
   }
-  TTF_Font *pacifico = TTF_OpenFont("./assets/Pacifico.ttf", 65); // not recognized, for whatever reason. 
-  printf("%s", TTF_GetError()); 
-  sdl_render_text("THIS IS TEXT", pacifico, RGB_BLACK, (vector_t) {200, 200}); 
+  sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
   speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);
