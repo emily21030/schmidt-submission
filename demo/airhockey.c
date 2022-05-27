@@ -583,7 +583,7 @@ state_t *emscripten_init() {
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
   POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
-  BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.mp3");
+  //BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.mp3");
   //Mix_PlayMusic(BACKGROUND_MUSIC, -1);
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
