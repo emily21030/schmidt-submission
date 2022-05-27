@@ -141,3 +141,13 @@ Game!!
 **BUGS:** The path for the font is not recognized, and "SDL not built with thread support, apparently". 
 
 **RESOURCES USED:** None. No responses from TAs, either.  
+
+## Friday, 5/27 8:30am - 10:15am
+
+**WHO:** Roy 
+
+**WHAT:** Trying to implement sounds. Lots of failed debugging. 
+
+**BUGS:** "unrecognized audio format"... despite the audio format being a WAV file. SDL just does not cooperate despite numerous tutorials indicating that I've done nothing wrong. 
+
+**RESOURCES USED:** SDL documentation, SDL_Mixer tutorials. 

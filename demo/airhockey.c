@@ -13,6 +13,7 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 const double X_SIZE = 1200.0;
 const double Y_SIZE = 800.0;
@@ -84,6 +85,10 @@ int PPG = 1;
 int PPG_POWERUP = 2; 
 
 TTF_Font *PACIFICO;
+Mix_Music *BACKGROUND_MUSIC;
+Mix_Chunk *BOUNCE_SOUND;
+Mix_Chunk *GOAL_SOUND;
+Mix_Chunk *POWERUP_SOUND; 
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -374,11 +379,13 @@ void check_goal(state_t *state) {
     state->player_1_score = state->player_1_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
     body_set_velocity(puck, VEC_ZERO);
+    Mix_PlayChannel(-1, GOAL_SOUND, 1); 
     printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
     state->player_2_score = state->player_2_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
     body_set_velocity(puck, VEC_ZERO);
+    Mix_PlayChannel(-1, GOAL_SOUND, 1); 
     printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   }
 }
@@ -502,6 +509,7 @@ void powerup_collide(state_t *state) {
   for(int i = 0; i < list_size(powerups); i++) {
     body_t *powerup_body = list_get(powerups, i); 
     if((fabs(body_get_centroid(powerup_body).x - body_get_centroid(puck).x) < PUCK_RADIUS) && (fabs(body_get_centroid(powerup_body).y - body_get_centroid(puck).y) < PUCK_RADIUS)) {
+      Mix_PlayChannel(-1, POWERUP_SOUND, 1); 
       state->powerup = get_correct_powerup(body_get_info(powerup_body), state);
       state->powerup_active = body_get_info(powerup_body); 
       body_remove(powerup_body); 
@@ -518,10 +526,12 @@ void change_player_designations(state_t *state) {
   if(collided1.collided) {
     state->last_touched = player1;
     state->other_player = player2; 
+    Mix_PlayChannel(-1, BOUNCE_SOUND, 1); 
   }
   else if(collided2.collided) {
     state->last_touched = player2;
     state->other_player = player1; 
+    Mix_PlayChannel(-1, BOUNCE_SOUND, 1); 
   }
 }
 
@@ -569,7 +579,10 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
-  PACIFICO = TTF_OpenFont("./assets/Pacifico.ttf", 65); // not recognized, for whatever reason. 
+  PACIFICO = TTF_OpenFont("../assets/Pacifico.ttf", 65); // not recognized, for whatever reason.
+  BOUNCE_SOUND = Mix_LoadWAV("../assets/bounce.wav");
+  GOAL_SOUND = Mix_LoadWAV("../assets/goal.wav");
+  POWERUP_SOUND = Mix_LoadWAV("../assets/powerup.wav"); 
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }

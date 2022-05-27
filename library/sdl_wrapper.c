@@ -3,6 +3,7 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -127,6 +128,7 @@ void sdl_init(vector_t min, vector_t max) {
   max_diff = vec_subtract(max, center);
   SDL_Init(SDL_INIT_EVERYTHING);
   TTF_Init();
+  Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048); 
   window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT,
                             SDL_WINDOW_RESIZABLE);
@@ -140,6 +142,7 @@ bool sdl_is_done(void *state) {
     switch (event->type) {
     case SDL_QUIT:
       TTF_Quit();
+      Mix_Quit();
       free(event);
       return true;
     case SDL_KEYDOWN:
