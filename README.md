@@ -142,12 +142,13 @@ Game!!
 
 **RESOURCES USED:** None. No responses from TAs, either.  
 
-## Friday, 5/27 8:30am - 10:15am
+## Friday, 5/27 8:30am - 10:45am
 
 **WHO:** Roy 
 
-**WHAT:** Trying to implement sounds. Lots of failed debugging. 
+**WHAT:** Implemented sound! 
 
-**BUGS:** "unrecognized audio format"... despite the audio format being a WAV file. SDL just does not cooperate despite numerous tutorials indicating that I've done nothing wrong. 
+**BUGS:** None. Our sound effects suck though. 
 
 **RESOURCES USED:** SDL documentation, SDL_Mixer tutorials. 
+

@@ -579,10 +579,13 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
-  PACIFICO = TTF_OpenFont("../assets/Pacifico.ttf", 65); // not recognized, for whatever reason.
-  BOUNCE_SOUND = Mix_LoadWAV("../assets/bounce.wav");
-  GOAL_SOUND = Mix_LoadWAV("../assets/goal.wav");
-  POWERUP_SOUND = Mix_LoadWAV("../assets/powerup.wav"); 
+  PACIFICO = TTF_OpenFont("./assets/Pacifico.ttf", 65); // not recognized, for whatever reason.
+  BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
+  if(BOUNCE_SOUND == NULL) {
+    printf( "Failed to load bounce sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+  }
+  GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
+  POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }

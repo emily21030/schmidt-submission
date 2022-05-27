@@ -128,7 +128,10 @@ void sdl_init(vector_t min, vector_t max) {
   max_diff = vec_subtract(max, center);
   SDL_Init(SDL_INIT_EVERYTHING);
   TTF_Init();
-  Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048); 
+  if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+                {
+                    printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+                }
   window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT,
                             SDL_WINDOW_RESIZABLE);
