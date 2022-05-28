@@ -86,7 +86,10 @@ Mix_Chunk *GOAL_SOUND;
 Mix_Chunk *POWERUP_SOUND; 
 SDL_Surface *PUCK_IMG; 
 SDL_Surface *BLUE_PADDLE;
-SDL_Surface *RED_PADDLE; 
+SDL_Surface *RED_PADDLE;
+SDL_Texture *START_MSG;
+SDL_Texture *WIN_MSG1;
+SDL_Texture *WIN_MSG2;
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -359,13 +362,14 @@ char* rand_powerup() {
   }
 }
 
+
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
+    sdl_render_text(WIN_MSG1, (vector_t){600.0, 400.0}); 
     printf("Player 1 wins! \n");
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
+    sdl_render_text(WIN_MSG2, (vector_t){600.0, 400.0}); 
     printf("Player 2 wins! \n");
     exit(0);
   }
@@ -613,6 +617,9 @@ state_t *emscripten_init() {
   BLUE_PADDLE = IMG_Load("assets/bpaddle.png");
   RED_PADDLE = IMG_Load("assets/rpaddle.png");
   sdl_on_key((key_handler_t)updated_key_handler_func);
+  START_MSG = make_text("THIS IS TEXT", PACIFICO, RGB_BLACK);
+  WIN_MSG1 = make_text("PLAYER 1 WINS!", PACIFICO, RGB_BLACK);
+  WIN_MSG2 = make_text("PLAYER 2 WINS!", PACIFICO, RGB_BLACK);
   return state;
 }
 
@@ -640,7 +647,7 @@ void emscripten_main(state_t *state) {
       printf("Powerup deactivated! \n");
     }
   }
-  sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
+  sdl_render_text(START_MSG, (vector_t) {200, 200}); 
   speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);

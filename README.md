@@ -162,12 +162,22 @@ Game!!
 
 **RESOURCES USED:** SDL documentation and tutorials.
 
-## Saturday, 5/27 9:00pm - 11:15pm
+## Friday, 5/27 9:00pm - 11:15pm
 
 **WHO:** Roy 
 
 **WHAT:** IMAGES WORK. And they stick to the body too. 
 
 **BUGS:** No text. Oh well. 
+
+**RESOURCES USED:** SDL documentation and tutorials.
+
+## Saturday, 5/28 1:30pm - 3:30pm
+
+**WHO:** Emily 
+
+**WHAT:** Removed SDL errors printed to console on boot up of game. Reorganized use of TTF in airhockey.c to match structure of images.
+
+**BUGS:** Still no text. Oh well. 
 
 **RESOURCES USED:** SDL documentation and tutorials.
