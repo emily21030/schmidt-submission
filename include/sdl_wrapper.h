@@ -141,8 +141,6 @@ double time_since_last_tick(void);
 
 void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position);
 
-SDL_Texture *sdl_make_image(SDL_Surface *image);
-
-void sdl_body_image(SDL_Texture *image_texture, body_t *body);
+void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh);
 
 #endif // #ifndef __SDL_WRAPPER_H__

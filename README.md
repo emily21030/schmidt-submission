@@ -152,3 +152,12 @@ Game!!
 
 **RESOURCES USED:** SDL documentation, SDL_Mixer tutorials. 
 
+## Friday, 5/27 8:00pm - 11:00pm
+
+**WHO:** Roy 
+
+**WHAT:** Made some balancing changes. Reset player positions and removed all powerup effects after a goal. Attempted to implement text and images, both to no avail. 
+
+**BUGS:** Neither text nor images works. 
+
+**RESOURCES USED:** SDL documentation and tutorials.

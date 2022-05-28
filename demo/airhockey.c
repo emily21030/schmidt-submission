@@ -9,11 +9,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
 
 const double X_SIZE = 1200.0;
 const double Y_SIZE = 800.0;
@@ -89,6 +84,7 @@ Mix_Music *BACKGROUND_MUSIC;
 Mix_Chunk *BOUNCE_SOUND;
 Mix_Chunk *GOAL_SOUND;
 Mix_Chunk *POWERUP_SOUND; 
+SDL_Surface *PUCK_IMG; 
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -373,6 +369,20 @@ void check_win(state_t *state) {
   }
 }
 
+void reset_positions(state_t *state) {
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  body_set_centroid(player1, (vector_t) {PADDING + WALL_THICKNESS + (X_TABLE / 4), (Y_TABLE / 2) + PADDING});
+  body_set_centroid(player2, (vector_t) {X_SIZE - PADDING - WALL_THICKNESS - (X_TABLE / 4), (Y_TABLE / 2) + PADDING}); 
+  body_set_velocity(player1, VEC_ZERO);
+  body_set_velocity(player2, VEC_ZERO);
+  state->ppg = PPG;
+  state->powerup_active = NULL;
+  state->powerup_time = 0.0;
+  state->powerup_affects = NULL; 
+  state->powerup = NULL; 
+}
+
 void check_goal(state_t *state) {
   body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
   if (body_get_centroid(puck).x > X_SIZE - PADDING - (WALL_THICKNESS / 2)) {
@@ -380,12 +390,14 @@ void check_goal(state_t *state) {
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
     body_set_velocity(puck, VEC_ZERO);
     Mix_PlayChannel(-1, GOAL_SOUND, 0); 
+    reset_positions(state); 
     printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
     state->player_2_score = state->player_2_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
     body_set_velocity(puck, VEC_ZERO);
     Mix_PlayChannel(-1, GOAL_SOUND, 0); 
+    reset_positions(state); 
     printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   }
 }
@@ -536,6 +548,9 @@ void change_player_designations(state_t *state) {
 }
 
 void speed_limit(state_t *state) {
+  if(state->powerup_active == NULL) {
+    return; 
+  }
   body_t *affected = state->powerup_affects; 
   if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0 || strcmp(state->powerup_active, X2_PUCK_VEL_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
@@ -579,12 +594,14 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
-  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); // not recognized, for whatever reason.
+  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
   POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
-  //BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.mp3");
-  //Mix_PlayMusic(BACKGROUND_MUSIC, -1);
+  PUCK_IMG = IMG_Load("assets/puck.png");
+  if(PUCK_IMG == NULL) {
+    printf("PUCK_IMG NULL \n");
+  }
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }
@@ -614,6 +631,7 @@ void emscripten_main(state_t *state) {
     }
   }
   sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
+  sdl_make_sprite(PUCK_IMG, list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0), POWERUP_RADIUS * 2);
   speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);
@@ -628,6 +646,8 @@ void emscripten_main(state_t *state) {
 }
 
 void emscripten_free(state_t *state) {
+  Mix_CloseAudio();
+  TTF_CloseFont(PACIFICO);
   scene_free(state->scene);
   free(state);
 }

@@ -127,7 +127,14 @@ void sdl_init(vector_t min, vector_t max) {
   center = vec_multiply(0.5, vec_add(min, max));
   max_diff = vec_subtract(max, center);
   SDL_Init(SDL_INIT_EVERYTHING);
-  TTF_Init();
+  int imgFlags = IMG_INIT_JPG|IMG_INIT_PNG;
+  IMG_Init(imgFlags);
+  int ttfinit = TTF_Init();
+  if(ttfinit != 0) {
+    printf("TTF_INIT ERROR \n"); 
+  }
+  int mixFlags = MIX_INIT_MP3; 
+  Mix_Init(mixFlags);
   if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
                 {
                     printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
@@ -144,6 +151,7 @@ bool sdl_is_done(void *state) {
   while (SDL_PollEvent(event)) {
     switch (event->type) {
     case SDL_QUIT:
+      IMG_Quit(); 
       TTF_Quit();
       Mix_Quit();
       free(event);
@@ -282,17 +290,16 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   printf("%s \n", TTF_GetError()); 
 }
 
-SDL_Texture *sdl_make_image(SDL_Surface *image) {
+void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh) {
   SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer, image);
-  return image_texture;
-}
-
-void sdl_body_image(SDL_Texture *image_texture, body_t *body) {
   list_t *points = body_get_shape(body);
-  SDL_Rect text;
-  text.x = (*(vector_t *)list_get(points, 3)).x;
-  text.y = WINDOW_HEIGHT - (*(vector_t *)list_get(points, 2)).y;
-  text.w = vec_subtract(*(vector_t *)list_get(points, 1), *(vector_t *)list_get(points, 0)).x; 
-  text.h = vec_subtract(*(vector_t *)list_get(points, 2), *(vector_t *)list_get(points, 1)).y; 
-  SDL_RenderCopy(renderer, image_texture, NULL, &text);
+  SDL_Rect rect;
+  rect.x = (*(vector_t *)list_get(points, 14)).x;
+  rect.y = WINDOW_HEIGHT - (*(vector_t *)list_get(points, 29)).y;
+  rect.w = wh; 
+  rect.h = wh; 
+  int sdlrc = SDL_RenderCopy(renderer, image_texture, NULL, &rect);
+  if(sdlrc != 0) {
+    printf("RENDER COPY FAILED \n");
+  }
 }
