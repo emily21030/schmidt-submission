@@ -656,6 +656,9 @@ void emscripten_main(state_t *state) {
 }
 
 void emscripten_free(state_t *state) {
+  SDL_FreeSurface(PUCK_IMG);
+  SDL_FreeSurface(BLUE_PADDLE);
+  SDL_FreeSurface(RED_PADDLE);
   Mix_CloseAudio();
   TTF_CloseFont(PACIFICO);
   scene_free(state->scene);
