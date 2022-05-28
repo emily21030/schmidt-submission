@@ -161,3 +161,13 @@ Game!!
 **BUGS:** Neither text nor images works. 
 
 **RESOURCES USED:** SDL documentation and tutorials.
+
+## Saturday, 5/27 9:00pm - 11:15pm
+
+**WHO:** Roy 
+
+**WHAT:** IMAGES WORK. And they stick to the body too. 
+
+**BUGS:** No text. Oh well. 
+
+**RESOURCES USED:** SDL documentation and tutorials.

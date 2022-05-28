@@ -290,16 +290,31 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   printf("%s \n", TTF_GetError()); 
 }
 
-void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh) {
+void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
   SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer, image);
-  list_t *points = body_get_shape(body);
+  vector_t center = body_get_centroid(body); 
+  vector_t position = get_window_position(center, get_window_center()); 
   SDL_Rect rect;
-  rect.x = (*(vector_t *)list_get(points, 14)).x;
-  rect.y = WINDOW_HEIGHT - (*(vector_t *)list_get(points, 29)).y;
-  rect.w = wh; 
-  rect.h = wh; 
+  rect.x = position.x - radius * get_scene_scale(get_window_center());
+  rect.y = position.y - radius * get_scene_scale(get_window_center());
+  rect.w = (radius * 2) * get_scene_scale(get_window_center());
+  rect.h = (radius * 2) * get_scene_scale(get_window_center());
   int sdlrc = SDL_RenderCopy(renderer, image_texture, NULL, &rect);
   if(sdlrc != 0) {
     printf("RENDER COPY FAILED \n");
   }
+  SDL_RenderPresent(renderer); 
+}
+
+void render_img(SDL_Surface *surface, body_t *body, double radius) {
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface); 
+  vector_t center = body_get_centroid(body); 
+  vector_t position = get_window_position(center, get_window_center()); 
+  SDL_Rect rect;
+  rect.x = position.x - radius/1200.0 * WINDOW_WIDTH;
+  rect.y = position.y - radius/800.0 * WINDOW_HEIGHT;
+  rect.w = radius/1200.0 * WINDOW_WIDTH;
+  rect.h = radius/800.0 * WINDOW_HEIGHT;
+  SDL_RenderCopy(renderer, texture, NULL, &rect);
+  SDL_RenderPresent(renderer); 
 }

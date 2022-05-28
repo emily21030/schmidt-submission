@@ -2,9 +2,9 @@
 #include "collision.h"
 #include "forces.h"
 #include "sdl_wrapper.h"
-#include "time.h"
 #include "vector.h"
 #include <string.h>
+#include <time.h>
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -85,6 +85,8 @@ Mix_Chunk *BOUNCE_SOUND;
 Mix_Chunk *GOAL_SOUND;
 Mix_Chunk *POWERUP_SOUND; 
 SDL_Surface *PUCK_IMG; 
+SDL_Surface *BLUE_PADDLE;
+SDL_Surface *RED_PADDLE; 
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -303,8 +305,8 @@ void make_walls(state_t *state) {
 }
 
 void initialize_players(state_t *state) {
-  body_t *player_1 = make_circle(PADDLE_MASS, GREEN_1, (vector_t){PADDING + WALL_THICKNESS + (X_TABLE / 4) , (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_1_INFO);
-  body_t *player_2 = make_circle(PADDLE_MASS, GREEN_1, (vector_t){X_SIZE - PADDING - WALL_THICKNESS - (X_TABLE / 4), (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_2_INFO);
+  body_t *player_1 = make_circle(PADDLE_MASS, RGB_WHITE, (vector_t){PADDING + WALL_THICKNESS + (X_TABLE / 4) , (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_1_INFO);
+  body_t *player_2 = make_circle(PADDLE_MASS, RGB_WHITE, (vector_t){X_SIZE - PADDING - WALL_THICKNESS - (X_TABLE / 4), (Y_TABLE / 2) + PADDING}, PADDLE_RADIUS, PLAYER_2_INFO);
 
   scene_add_body(state->scene, player_1);
   scene_add_body(state->scene, player_2);
@@ -321,7 +323,7 @@ void initialize_players(state_t *state) {
 }
 
 void initialize_puck(state_t *state) {
-  body_t *puck = make_circle(PUCK_MASS, RED, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING}, PUCK_RADIUS, PUCK_INFO);
+  body_t *puck = make_circle(PUCK_MASS, RGB_WHITE, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING}, PUCK_RADIUS, PUCK_INFO);
   scene_add_body(state->scene, puck);
   for (size_t i = 0; i < scene_bodies(state->scene); i++) {
     body_t *body = scene_get_body(state->scene, i);
@@ -576,6 +578,15 @@ void speed_limit(state_t *state) {
   }
 }
 
+void render_circle_sprites(state_t *state) {
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  sdl_make_sprite(PUCK_IMG, puck, PUCK_RADIUS);
+  sdl_make_sprite(BLUE_PADDLE, player1, PADDLE_RADIUS);
+  sdl_make_sprite(RED_PADDLE, player2, PADDLE_RADIUS); 
+}
+
 state_t *emscripten_init() {
   srand(time(NULL));
   sdl_init(VEC_ZERO, (vector_t){X_SIZE, Y_SIZE});
@@ -599,9 +610,8 @@ state_t *emscripten_init() {
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
   POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
   PUCK_IMG = IMG_Load("assets/puck.png");
-  if(PUCK_IMG == NULL) {
-    printf("PUCK_IMG NULL \n");
-  }
+  BLUE_PADDLE = IMG_Load("assets/bpaddle.png");
+  RED_PADDLE = IMG_Load("assets/rpaddle.png");
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }
@@ -631,7 +641,6 @@ void emscripten_main(state_t *state) {
     }
   }
   sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
-  sdl_make_sprite(PUCK_IMG, list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0), POWERUP_RADIUS * 2);
   speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);
@@ -643,6 +652,7 @@ void emscripten_main(state_t *state) {
   check_win(state);
   //printf("numbodies: %d \n", (int) list_size(scene_get_body_list(state->scene))); 
   sdl_render_scene(state->scene);
+  render_circle_sprites(state);
 }
 
 void emscripten_free(state_t *state) {

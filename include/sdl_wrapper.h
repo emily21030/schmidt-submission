@@ -143,4 +143,6 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh);
 
+void render_img(SDL_Surface *surface, body_t *body, double radius); 
+
 #endif // #ifndef __SDL_WRAPPER_H__
