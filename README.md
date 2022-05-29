@@ -176,7 +176,8 @@ Game!!
 ## Sunday, 5/29 12:30pm - 1:30pm
 **WHO:** Kaushik 
 
-**WHAT:** Attempted to convert all info into enums to avoid confusion and potential memory leaks.
+**WHAT:** Attempted to convert all info into enums to avoid confusion and potential memory leaks. Also
+re-rewrote the key handler so that the resultant motion of the paddles is far more intuitive.
 
 **BUGS:** Enums don't work due to inconsistencies between void * and enum types. I just resolved the
 numerous warnings regarding our info types instead - now we no longer have warnings.
