@@ -204,7 +204,7 @@ Module['FS_createPath']("/", "assets", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/assets/score6.png", "start": 0, "end": 13492}, {"filename": "/assets/bkgmus.mp3", "start": 13492, "end": 1269451, "audio": 1}, {"filename": "/assets/puck.png", "start": 1269451, "end": 1314299}, {"filename": "/assets/score1.png", "start": 1314299, "end": 1327726}, {"filename": "/assets/score4.png", "start": 1327726, "end": 1337998}, {"filename": "/assets/bounce.wav", "start": 1337998, "end": 1387784, "audio": 1}, {"filename": "/assets/score7.png", "start": 1387784, "end": 1396512}, {"filename": "/assets/goal.wav", "start": 1396512, "end": 1534982, "audio": 1}, {"filename": "/assets/score3.png", "start": 1534982, "end": 1557037}, {"filename": "/assets/score0.png", "start": 1557037, "end": 1564599}, {"filename": "/assets/inkcircle.png", "start": 1564599, "end": 1977682}, {"filename": "/assets/score2.png", "start": 1977682, "end": 2000989}, {"filename": "/assets/bpaddle.png", "start": 2000989, "end": 2327537}, {"filename": "/assets/Pacifico.ttf", "start": 2327537, "end": 2403105}, {"filename": "/assets/rpaddle.png", "start": 2403105, "end": 2579714}, {"filename": "/assets/bkgmus.wav", "start": 2579714, "end": 16522576, "audio": 1}, {"filename": "/assets/powerup.wav", "start": 16522576, "end": 16642470, "audio": 1}, {"filename": "/assets/score5.png", "start": 16642470, "end": 16652356}, {"filename": "/assets/powerup1.png", "start": 16652356, "end": 17111340}], "remote_package_size": 17111340, "package_uuid": "0605e4ae-2844-4477-aee1-4efb9d5d6ece"});
+    loadPackage({"files": [{"filename": "/assets/score6.png", "start": 0, "end": 13492}, {"filename": "/assets/bkgmus.mp3", "start": 13492, "end": 1269451, "audio": 1}, {"filename": "/assets/puck.png", "start": 1269451, "end": 1314299}, {"filename": "/assets/score1.png", "start": 1314299, "end": 1327726}, {"filename": "/assets/score4.png", "start": 1327726, "end": 1337998}, {"filename": "/assets/bounce.wav", "start": 1337998, "end": 1387784, "audio": 1}, {"filename": "/assets/score7.png", "start": 1387784, "end": 1396512}, {"filename": "/assets/goal.wav", "start": 1396512, "end": 1534982, "audio": 1}, {"filename": "/assets/score3.png", "start": 1534982, "end": 1557037}, {"filename": "/assets/score0.png", "start": 1557037, "end": 1564599}, {"filename": "/assets/inkcircle.png", "start": 1564599, "end": 1977682}, {"filename": "/assets/score2.png", "start": 1977682, "end": 2000989}, {"filename": "/assets/bpaddle.png", "start": 2000989, "end": 2327537}, {"filename": "/assets/Pacifico.ttf", "start": 2327537, "end": 2403105}, {"filename": "/assets/rpaddle.png", "start": 2403105, "end": 2579714}, {"filename": "/assets/bkgmus.wav", "start": 2579714, "end": 16522576, "audio": 1}, {"filename": "/assets/powerup.wav", "start": 16522576, "end": 16642470, "audio": 1}, {"filename": "/assets/score5.png", "start": 16642470, "end": 16652356}, {"filename": "/assets/powerup1.png", "start": 16652356, "end": 17111340}], "remote_package_size": 17111340, "package_uuid": "ac17029d-bf20-45ec-a35c-89179f312af5"});
 
   })();
 
@@ -9424,21 +9424,10 @@ var dynCall_ji = Module["dynCall_ji"] = createExportWrapper("dynCall_ji");
 var dynCall_iiji = Module["dynCall_iiji"] = createExportWrapper("dynCall_iiji");
 
 
-function invoke_viiii(index,a1,a2,a3,a4) {
+function invoke_ii(index,a1) {
   var sp = stackSave();
   try {
-    getWasmTableEntry(index)(a1,a2,a3,a4);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0) throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_iii(index,a1,a2) {
-  var sp = stackSave();
-  try {
-    return getWasmTableEntry(index)(a1,a2);
+    return getWasmTableEntry(index)(a1);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;
@@ -9479,10 +9468,10 @@ function invoke_vi(index,a1) {
   }
 }
 
-function invoke_ii(index,a1) {
+function invoke_iii(index,a1,a2) {
   var sp = stackSave();
   try {
-    return getWasmTableEntry(index)(a1);
+    return getWasmTableEntry(index)(a1,a2);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;
@@ -9549,6 +9538,17 @@ function invoke_i(index) {
   var sp = stackSave();
   try {
     return getWasmTableEntry(index)();
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_viiii(index,a1,a2,a3,a4) {
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2,a3,a4);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;

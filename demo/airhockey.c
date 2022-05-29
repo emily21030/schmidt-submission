@@ -70,11 +70,11 @@ char *PLAYER_2_INFO = "2";
 char *PUCK_INFO = "p";
 char *WALL_INFO = "w";  
 
-const char *X2_PUCK_VEL_INFO = "v";
-const char *X2_NEXT_GOAL_INFO = "g";
-const char *X2_PLAYER_ACC_INFO = "a";
-const char *HALF_ENEMY_ACC_INFO = "e";
-const char *FREEZE_ENEMY_INFO = "f";
+char *X2_PUCK_VEL_INFO = "v";
+char *X2_NEXT_GOAL_INFO = "g";
+char *X2_PLAYER_ACC_INFO = "a";
+char *HALF_ENEMY_ACC_INFO = "e";
+char *FREEZE_ENEMY_INFO = "f";
 
 int PPG = 1; 
 int PPG_POWERUP = 2; 
