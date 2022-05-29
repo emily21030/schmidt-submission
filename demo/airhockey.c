@@ -87,6 +87,14 @@ Mix_Chunk *POWERUP_SOUND;
 SDL_Surface *PUCK_IMG; 
 SDL_Surface *BLUE_PADDLE;
 SDL_Surface *RED_PADDLE; 
+SDL_Surface *SCORE0;
+SDL_Surface *SCORE1;
+SDL_Surface *SCORE2;
+SDL_Surface *SCORE3;
+SDL_Surface *SCORE4;
+SDL_Surface *SCORE5;
+SDL_Surface *SCORE6;
+SDL_Surface *SCORE7;
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -587,6 +595,36 @@ void render_circle_sprites(state_t *state) {
   sdl_make_sprite(RED_PADDLE, player2, PADDLE_RADIUS); 
 }
 
+SDL_Surface *surface_from_score(int score) {
+  switch(score) {
+    case 0:
+      return SCORE0;
+    case 1:
+      return SCORE1;
+    case 2:
+      return SCORE2;
+    case 3:
+      return SCORE3;
+    case 4: 
+      return SCORE4;
+    case 5: 
+      return SCORE5;
+    case 6:
+      return SCORE6;
+    case 7:
+      return SCORE7;
+    default:
+      return SCORE0;
+  }
+  return SCORE0;
+}
+
+void draw_scoreboard(state_t *state) {
+  SDL_Surface *player1score = surface_from_score(state->player_1_score);
+  SDL_Surface *player2score = surface_from_score(state->player_2_score);
+  render_scoreboard(player1score, player2score); 
+}
+
 state_t *emscripten_init() {
   srand(time(NULL));
   sdl_init(VEC_ZERO, (vector_t){X_SIZE, Y_SIZE});
@@ -612,6 +650,14 @@ state_t *emscripten_init() {
   PUCK_IMG = IMG_Load("assets/puck.png");
   BLUE_PADDLE = IMG_Load("assets/bpaddle.png");
   RED_PADDLE = IMG_Load("assets/rpaddle.png");
+  SCORE0 = IMG_Load("assets/score0.png");
+  SCORE1 = IMG_Load("assets/score1.png");
+  SCORE2 = IMG_Load("assets/score2.png");
+  SCORE3 = IMG_Load("assets/score3.png");
+  SCORE4 = IMG_Load("assets/score4.png");
+  SCORE5 = IMG_Load("assets/score5.png");
+  SCORE6 = IMG_Load("assets/score6.png");
+  SCORE7 = IMG_Load("assets/score7.png");
   sdl_on_key((key_handler_t)updated_key_handler_func);
   return state;
 }
@@ -653,6 +699,7 @@ void emscripten_main(state_t *state) {
   //printf("numbodies: %d \n", (int) list_size(scene_get_body_list(state->scene))); 
   sdl_render_scene(state->scene);
   render_circle_sprites(state);
+  draw_scoreboard(state);
 }
 
 void emscripten_free(state_t *state) {

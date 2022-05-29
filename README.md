@@ -162,7 +162,7 @@ Game!!
 
 **RESOURCES USED:** SDL documentation and tutorials.
 
-## Saturday, 5/27 9:00pm - 11:15pm
+## Saturday, 5/27 9:00am - 11:15am
 
 **WHO:** Roy 
 
@@ -171,3 +171,13 @@ Game!!
 **BUGS:** No text. Oh well. 
 
 **RESOURCES USED:** SDL documentation and tutorials.
+
+## Saturday, 5/27 9:30pm - 10:00pm
+
+**WHO:** Roy 
+
+**WHAT:** SCOREBOARD
+
+**BUGS:** No text. Haven't tried. 
+
+**RESOURCES USED:** None.
