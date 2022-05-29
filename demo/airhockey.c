@@ -43,6 +43,10 @@ const vector_t UP_ACCEL = {0, 100};
 const vector_t DOWN_ACCEL = {0, -100};
 const vector_t LEFT_ACCEL = {-100, 0};
 const vector_t RIGHT_ACCEL = {100, 0};
+const vector_t UP_VEL = {0, 250};
+const vector_t DOWN_VEL = {0, -250};
+const vector_t LEFT_VEL = {-250, 0};
+const vector_t RIGHT_VEL = {250, 0};
 const double MIN_VEL = 150.0;
 const double MAX_VEL = 400.0;
 const double PUCK_MASS = 1;
@@ -177,7 +181,47 @@ void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
   body_set_velocity(body, new_velocity);  
 }
 
-void updated_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+void vel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  vector_t new_vel_1 = {0, 0};
+  vector_t new_vel_2 = {0, 0};
+  if (keyboard_states[SDL_SCANCODE_W]) {
+    new_vel_1 = vec_add(new_vel_1, UP_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_A]) {
+    new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_S]) {
+    new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_D]) {
+    new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_UP]) {
+    new_vel_2 = vec_add(new_vel_2, UP_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_LEFT]) {
+    new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_DOWN]) {
+    new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
+  }
+  if (keyboard_states[SDL_SCANCODE_RIGHT]) {
+    new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
+  }
+  if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
+    body_set_velocity(player_1, VEC_ZERO);
+  }
+  if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
+    body_set_velocity(player_2, VEC_ZERO);
+  }
+  body_set_velocity(player_1, new_vel_1);
+  body_set_velocity(player_2, new_vel_2);
+}
+
+void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
   body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
@@ -658,7 +702,7 @@ state_t *emscripten_init() {
   SCORE5 = IMG_Load("assets/score5.png");
   SCORE6 = IMG_Load("assets/score6.png");
   SCORE7 = IMG_Load("assets/score7.png");
-  sdl_on_key((key_handler_t)updated_key_handler_func);
+  sdl_on_key((key_handler_t)vel_key_handler_func);
   return state;
 }
 
