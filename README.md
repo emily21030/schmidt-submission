@@ -173,7 +173,7 @@ Game!!
 
 **RESOURCES USED:** None.
 
-## Sunday, 5/29 12:30pm - 1:30pm
+## Sunday, 5/29 12:30pm - 2:30pm
 **WHO:** Kaushik 
 
 **WHAT:** Attempted to convert all info into enums to avoid confusion and potential memory leaks. Also
