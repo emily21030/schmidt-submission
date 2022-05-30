@@ -306,15 +306,11 @@ void sdl_render_text(SDL_Texture *texture, vector_t position) {
   text.y = 1500;
   text.w = 500;
   text.h = 500;*/
-  if (texture == NULL) {
-    printf("CreateTexture error \n");
-  }
-  int x = position.x;
-  int y = WINDOW_HEIGHT - position.y;
-  int w, h;
-  SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-
-  render_texture(texture, x, y, w, h);
+  text.x = position.x * get_scene_scale(get_window_center());
+  text.y = position.y * get_scene_scale(get_window_center());
+  text.w = text_width;
+  text.h = text_height;
+  SDL_RenderCopy(renderer, textTexture, NULL, &text);
   SDL_RenderPresent(renderer); 
 }
 

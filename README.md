@@ -173,7 +173,7 @@ Game!!
 
 **RESOURCES USED:** None.
 
-## Sunday, 5/29 12:30pm - 1:30pm
+## Sunday, 5/29 12:30pm - 2:30pm
 **WHO:** Kaushik 
 
 **WHAT:** Attempted to convert all info into enums to avoid confusion and potential memory leaks. Also
@@ -183,3 +183,12 @@ re-rewrote the key handler so that the resultant motion of the paddles is far mo
 numerous warnings regarding our info types instead - now we no longer have warnings.
 
 **RESOURCES USED:** None.
+
+## Sunday, 5/30 9:30am - 10:30am
+**WHO:** Roy 
+
+**WHAT:** Made text. 
+
+**BUGS:** None!
+
+**RESOURCES USED:** SDL documentation.
