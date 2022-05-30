@@ -743,11 +743,10 @@ void emscripten_main(state_t *state) {
   speed_limit(state);
   check_goal(state);
   check_win(state);
-  //printf("numbodies: %d \n", (int) list_size(scene_get_body_list(state->scene))); 
   sdl_render_scene(state->scene);
   render_circle_sprites(state);
   draw_scoreboard(state);
-  sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
+  sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
 }
 
 void emscripten_free(state_t *state) {

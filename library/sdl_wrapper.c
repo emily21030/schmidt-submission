@@ -291,6 +291,7 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   text.w = text_width;
   text.h = text_height;
   SDL_RenderCopy(renderer, textTexture, NULL, &text);
+  SDL_RenderPresent(renderer); 
 }
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
