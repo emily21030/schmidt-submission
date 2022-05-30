@@ -183,3 +183,12 @@ re-rewrote the key handler so that the resultant motion of the paddles is far mo
 numerous warnings regarding our info types instead - now we no longer have warnings.
 
 **RESOURCES USED:** None.
+
+## Sunday, 5/30 9:30am - 10:30am
+**WHO:** Roy 
+
+**WHAT:** Made text. 
+
+**BUGS:** None!
+
+**RESOURCES USED:** SDL documentation.
