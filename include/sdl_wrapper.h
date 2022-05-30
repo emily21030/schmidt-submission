@@ -147,6 +147,6 @@ void sdl_render_text(SDL_Texture *texture, vector_t position);
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh);
 
-void render_img(SDL_Surface *surface, body_t *body, double radius); 
+void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2); 
 
 #endif // #ifndef __SDL_WRAPPER_H__

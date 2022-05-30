@@ -13,6 +13,10 @@ const char WINDOW_TITLE[] = "CS 3";
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 500;
 const double MS_PER_S = 1e3;
+const int SCORE1_X = 200;
+const int SCORE1_Y = 10;
+const int SCORE2_X = 750;
+const int SCORE2_Y = 10;
 
 /**
  * The coordinate at the center of the screen.
@@ -326,14 +330,20 @@ void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
   SDL_RenderPresent(renderer);
 }
 
-void render_img(SDL_Surface *surface, body_t *body, double radius) {
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface); 
-  vector_t center = body_get_centroid(body); 
-  vector_t position = get_window_position(center, get_window_center()); 
-  int x = position.x - radius/1200.0 * WINDOW_WIDTH;
-  int y = position.y - radius/800.0 * WINDOW_HEIGHT;
-  int w = radius/1200.0 * WINDOW_WIDTH;
-  int h = radius/800.0 * WINDOW_HEIGHT;
-  render_texture(texture, x, y, w, h);
+void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
+  SDL_Texture *texture1 = SDL_CreateTextureFromSurface(renderer, score1); 
+  SDL_Texture *texture2 = SDL_CreateTextureFromSurface(renderer, score2); 
+  SDL_Rect rect1;
+  rect1.x = SCORE1_X;
+  rect1.y = SCORE1_Y;
+  rect1.w = 50;
+  rect1.h = 100;
+  SDL_Rect rect2;
+  rect2.x = SCORE2_X;
+  rect2.y = SCORE2_Y;
+  rect2.w = 50;
+  rect2.h = 100;
+  SDL_RenderCopy(renderer, texture1, NULL, &rect1);
+  SDL_RenderCopy(renderer, texture2, NULL, &rect2);
   SDL_RenderPresent(renderer); 
 }
