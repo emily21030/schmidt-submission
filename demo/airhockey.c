@@ -465,21 +465,25 @@ void double_velocity(state_t *state) {
 }
 
 void double_accel(state_t *state) {
-  body_t *last_touched = state->last_touched; 
-  state->powerup_affects = last_touched; 
-  body_set_velocity(last_touched, vec_multiply(2.0, body_get_velocity(last_touched)));   
+  if(state->powerup_affects == NULL) {
+    state->powerup_affects = state->last_touched; 
+  }
+  body_set_velocity(state->powerup_affects, vec_multiply(2.0, body_get_velocity(state->powerup_affects)));   
   
 }
 
 void half_accel(state_t *state) {
-  body_t *other_player = state->other_player; 
-  state->powerup_affects = other_player; 
-  body_set_velocity(other_player, vec_multiply(0.5, body_get_velocity(other_player)));   
+  if(state->powerup_affects == NULL) {
+    state->powerup_affects = state->other_player; 
+  }
+  body_set_velocity(state->powerup_affects, vec_multiply(0.5, body_get_velocity(state->powerup_affects)));   
 }
 
 void freeze_enemy(state_t *state) {
-  state->powerup_affects = state->other_player;
-  body_set_velocity(state->other_player, (vector_t) {0, 0});
+  if(state->powerup_affects == NULL) {
+    state->powerup_affects = state->other_player; 
+  }
+  body_set_velocity(state->powerup_affects, (vector_t) {0, 0});
 }
 
 void double_goal(state_t *state) {
@@ -730,7 +734,6 @@ void emscripten_main(state_t *state) {
       printf("Powerup deactivated! \n");
     }
   }
-  sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
   speed_limit(state);
   powerup_collide(state);
   check_player_1_boundary(state);
@@ -744,6 +747,7 @@ void emscripten_main(state_t *state) {
   sdl_render_scene(state->scene);
   render_circle_sprites(state);
   draw_scoreboard(state);
+  sdl_render_text("THIS IS TEXT", PACIFICO, RGB_BLACK, (vector_t) {200, 200}); 
 }
 
 void emscripten_free(state_t *state) {

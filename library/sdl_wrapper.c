@@ -286,12 +286,11 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   text.y = 1500;
   text.w = 500;
   text.h = 500;*/
-  text.x = position.x;
-  text.y = WINDOW_HEIGHT - position.y;
+  text.x = position.x * get_scene_scale(get_window_center());
+  text.y = position.y * get_scene_scale(get_window_center());
   text.w = text_width;
   text.h = text_height;
   SDL_RenderCopy(renderer, textTexture, NULL, &text);
-  printf("%s \n", TTF_GetError()); 
 }
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
