@@ -52,9 +52,9 @@ Game!!
 
 **WHAT:** Added goals, scoring, and checking win condition. 
 
-**BUGS:** 
+**BUGS:**
 
-**RESOURCES USED:** libraries: SDL_mixer 2.0 for sound, sdl ttf, sdl image
+**RESOURCES USED:** none
 
 ## Saturday, 5/21 11:00am - 1:15pm
 **WHO:** Roy
@@ -93,7 +93,6 @@ Game!!
 **RESOURCES USED:** Stackoverflow - I forgot how to make function pointers. 
 
 ## Monday, 5/23 7:00pm - 8:30pm, 9:30pm - 10:30pm
-
 **WHO:** Roy
 
 **WHAT:** Powerups spawn. Randomized powerup spawning and implementation works! 
@@ -103,7 +102,6 @@ Game!!
 **RESOURCES USED:** None. 
 
 ## Tuesday, 5/24 9:00pm - 10:00pm
-
 **WHO:** Kaushik
 
 **WHAT:** Rewrote key handler using SDL_GetKeyboardState to accept multiple simultaneous key inputs and account for diagonal motion!
@@ -113,7 +111,6 @@ Game!!
 **RESOURCES USED:** SDL documentation
 
 ## Wednesday, 5/24 2:00am - 3:00am
-
 **WHO:** Avi 
 
 **WHAT:** Resolved the laggy handler. Added a cap on the amount of power-ups that appear on the screen at once. 
@@ -123,7 +120,6 @@ Game!!
 **RESOURCES USED:** 
 
 ## Thursday, 5/26 1:30pm - 3:30pm
-
 **WHO:** Roy 
 
 **WHAT:** Trying to implement text rendering. Lots of failed debugging. 
@@ -133,7 +129,6 @@ Game!!
 **RESOURCES USED:** StackOverFlow. 
 
 ## Thursday, 5/26 10pm - 11:30pm
-
 **WHO:** Roy 
 
 **WHAT:** Trying to implement text rendering. Lots of failed debugging. 
@@ -143,7 +138,6 @@ Game!!
 **RESOURCES USED:** None. No responses from TAs, either.  
 
 ## Friday, 5/27 8:30am - 10:45am
-
 **WHO:** Roy 
 
 **WHAT:** Implemented sound! 
@@ -153,7 +147,6 @@ Game!!
 **RESOURCES USED:** SDL documentation, SDL_Mixer tutorials. 
 
 ## Friday, 5/27 8:00pm - 11:00pm
-
 **WHO:** Roy 
 
 **WHAT:** Made some balancing changes. Reset player positions and removed all powerup effects after a goal. Attempted to implement text and images, both to no avail. 
@@ -162,8 +155,7 @@ Game!!
 
 **RESOURCES USED:** SDL documentation and tutorials.
 
-## Friday, 5/27 9:00pm - 11:15pm
-
+## Saturday, 5/28 9:00am - 11:15am
 **WHO:** Roy 
 
 **WHAT:** IMAGES WORK. And they stick to the body too. 
@@ -172,12 +164,22 @@ Game!!
 
 **RESOURCES USED:** SDL documentation and tutorials.
 
-## Saturday, 5/28 1:30pm - 3:30pm
+## Saturday, 5/28 9:30pm - 10:00pm
+**WHO:** Roy 
 
-**WHO:** Emily 
+**WHAT:** SCOREBOARD
 
-**WHAT:** Removed SDL errors printed to console on boot up of game. Reorganized use of TTF in airhockey.c to match structure of images.
+**BUGS:** No text. Haven't tried. 
 
-**BUGS:** Still no text. Oh well. 
+**RESOURCES USED:** None.
 
-**RESOURCES USED:** SDL documentation and tutorials.
+## Sunday, 5/29 12:30pm - 1:30pm
+**WHO:** Kaushik 
+
+**WHAT:** Attempted to convert all info into enums to avoid confusion and potential memory leaks. Also
+re-rewrote the key handler so that the resultant motion of the paddles is far more intuitive.
+
+**BUGS:** Enums don't work due to inconsistencies between void * and enum types. I just resolved the
+numerous warnings regarding our info types instead - now we no longer have warnings.
+
+**RESOURCES USED:** None.
