@@ -419,12 +419,12 @@ char* rand_powerup() {
 
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
-    SDL_Delay(500); 
+    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){500.0, 300.0}); 
+    SDL_Delay(1500); 
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
-    SDL_Delay(500); 
+    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){500.0, 300.0}); 
+    SDL_Delay(1500); 
     exit(0);
   }
 }
@@ -776,12 +776,26 @@ void emscripten_main(state_t *state) {
   if(state->powerup_available != NULL) {
     render_powerup_sprite(state); 
   }
+  sdl_clear();
 }
 
 void emscripten_free(state_t *state) {
   SDL_FreeSurface(PUCK_IMG);
   SDL_FreeSurface(BLUE_PADDLE);
   SDL_FreeSurface(RED_PADDLE);
+  SDL_FreeSurface(SCORE0);
+  SDL_FreeSurface(SCORE1);
+  SDL_FreeSurface(SCORE2);
+  SDL_FreeSurface(SCORE3);
+  SDL_FreeSurface(SCORE4);
+  SDL_FreeSurface(SCORE5);
+  SDL_FreeSurface(SCORE6);
+  SDL_FreeSurface(SCORE7);
+  SDL_FreeSurface(DOUBLEACC_P);
+  SDL_FreeSurface(DOUBLEVEL_P);
+  SDL_FreeSurface(DOUBLEGOAL_P);
+  SDL_FreeSurface(FREEZE_P);
+  SDL_FreeSurface(HALFACC_P);
   Mix_CloseAudio();
   TTF_CloseFont(PACIFICO);
   scene_free(state->scene);

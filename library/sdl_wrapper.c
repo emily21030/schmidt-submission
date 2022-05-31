@@ -17,6 +17,8 @@ const int SCORE1_X = 200;
 const int SCORE1_Y = 10;
 const int SCORE2_X = 750;
 const int SCORE2_Y = 10;
+const int SCORE_W = 50; 
+const int SCORE_H = 100; 
 
 /**
  * The coordinate at the center of the screen.
@@ -280,12 +282,7 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
   int text_width = textSurface->w;
   int text_height = textSurface->h;
-  //SDL_FreeSurface(textSurface);
   SDL_Rect text;
-  /*text.x = 1500;
-  text.y = 1500;
-  text.w = 500;
-  text.h = 500;*/
   text.x = position.x * get_scene_scale(get_window_center());
   text.y = position.y * get_scene_scale(get_window_center());
   text.w = text_width;
@@ -304,9 +301,6 @@ void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
   rect.w = (radius * 2) * get_scene_scale(get_window_center());
   rect.h = (radius * 2) * get_scene_scale(get_window_center());
   int sdlrc = SDL_RenderCopy(renderer, image_texture, NULL, &rect);
-  if(sdlrc != 0) {
-    printf("RENDER COPY FAILED \n");
-  }
   SDL_RenderPresent(renderer); 
 }
 
@@ -316,13 +310,13 @@ void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
   SDL_Rect rect1;
   rect1.x = SCORE1_X;
   rect1.y = SCORE1_Y;
-  rect1.w = 50;
-  rect1.h = 100;
+  rect1.w = SCORE_W;
+  rect1.h = SCORE_H;
   SDL_Rect rect2;
   rect2.x = SCORE2_X;
   rect2.y = SCORE2_Y;
-  rect2.w = 50;
-  rect2.h = 100;
+  rect2.w = SCORE_W;
+  rect2.h = SCORE_H;
   SDL_RenderCopy(renderer, texture1, NULL, &rect1);
   SDL_RenderCopy(renderer, texture2, NULL, &rect2);
   SDL_RenderPresent(renderer); 
