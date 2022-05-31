@@ -184,7 +184,7 @@ numerous warnings regarding our info types instead - now we no longer have warni
 
 **RESOURCES USED:** None.
 
-## Sunday, 5/30 9:30am - 10:30am
+## Monday, 5/30 9:30am - 10:30am
 **WHO:** Roy 
 
 **WHAT:** Made text. 
@@ -192,3 +192,12 @@ numerous warnings regarding our info types instead - now we no longer have warni
 **BUGS:** None!
 
 **RESOURCES USED:** SDL documentation.
+
+## Monday, 5/30 9:00pm - 10:30pm
+**WHO:** Roy 
+
+**WHAT:** Found and implemented powerup sprites. 
+
+**BUGS:** None!
+
+**RESOURCES USED:** None.

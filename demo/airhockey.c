@@ -99,6 +99,11 @@ SDL_Surface *SCORE4;
 SDL_Surface *SCORE5;
 SDL_Surface *SCORE6;
 SDL_Surface *SCORE7;
+SDL_Surface *DOUBLEACC_P;
+SDL_Surface *DOUBLEGOAL_P;
+SDL_Surface *DOUBLEVEL_P;
+SDL_Surface *FREEZE_P;
+SDL_Surface *HALFACC_P; 
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -109,6 +114,7 @@ typedef struct state {
   char *powerup_active;
   double powerup_time; 
   body_t *powerup_affects;
+  char *powerup_available; 
   int ppg; // points per goal
   int player_1_score;
   int player_2_score;
@@ -414,11 +420,11 @@ char* rand_powerup() {
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
     sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
-    printf("Player 1 wins! \n");
+    SDL_Delay(500); 
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
     sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){600.0, 400.0}); 
-    printf("Player 2 wins! \n");
+    SDL_Delay(500); 
     exit(0);
   }
 }
@@ -523,53 +529,26 @@ void add_powerup(state_t *state, char* powerup) {
   double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
   double rand_y = rand_between(min_y, max_y); 
   vector_t rand_center = (vector_t) {rand_x, rand_y};
-  rgb_color_t powerup_color; 
-  switch(*powerup) {
-    case X2_PUCK_VEL_INFO_C:
-      powerup_color = RED;
-      break;
-    case X2_NEXT_GOAL_INFO_C:
-      powerup_color = ORANGE;
-      break;
-    case X2_PLAYER_ACC_INFO_C:
-      powerup_color = YELLOW;
-      break;
-    case HALF_ENEMY_ACC_INFO_C:
-      powerup_color = GREEN_2;
-      break;
-    case FREEZE_ENEMY_INFO_C:
-      powerup_color = INDIGO;
-      break;
-    default:
-      powerup_color = BLUE;
-      break; 
-  }
-  body_t *powerup_body = make_circle(POWERUP_MASS, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
+  body_t *powerup_body = make_circle(POWERUP_MASS, RGB_WHITE, rand_center, POWERUP_RADIUS, powerup); 
   scene_add_body(state->scene, powerup_body);   
+  state->powerup_available = powerup; 
 }
 
 powerup_func get_correct_powerup(char *info, state_t *state) {
   switch(*info) {
     case X2_PUCK_VEL_INFO_C:
-      printf("DOUBLE VELOCITY \n");
       return double_velocity;
     case X2_PLAYER_ACC_INFO_C:
-      printf("DOUBLE ACCEL \n");
       return double_accel;
     case X2_NEXT_GOAL_INFO_C:
-      printf("DOUBLE GOAL \n");
       return double_goal;
     case HALF_ENEMY_ACC_INFO_C:
-      printf("HALF ACCEL \n");
       return half_accel;
     case FREEZE_ENEMY_INFO_C:
-      printf("ENEMY FROZEN \n");
       return freeze_enemy;
     default:
-      printf("ENEMY FROZEN \n");
       return freeze_enemy;
   }
-  printf("ENEMY FROZEN \n");
   return freeze_enemy;
 }
 
@@ -582,7 +561,20 @@ void powerup_collide(state_t *state) {
       Mix_PlayChannel(-1, POWERUP_SOUND, 0); 
       state->powerup = get_correct_powerup(body_get_info(powerup_body), state);
       state->powerup_active = body_get_info(powerup_body); 
+      state->powerup_available = NULL; 
       body_remove(powerup_body); 
+    }
+  }
+}
+
+void wall_sounds(state_t *state) {
+  list_t *walls = get_bodies_by_type(state->scene, WALL_INFO);
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
+  for(int i = 0; i < list_size(walls); i++) {
+    body_t *this_wall = list_get(walls, i); 
+    collision_info_t collided = find_collision(body_get_shape(puck), body_get_shape(this_wall));
+    if(collided.collided) {
+      Mix_PlayChannel(-1, BOUNCE_SOUND, 0); 
     }
   }
 }
@@ -612,12 +604,12 @@ void speed_limit(state_t *state) {
   body_t *affected = state->powerup_affects; 
   if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0 || strcmp(state->powerup_active, X2_PUCK_VEL_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(body_get_velocity(affected).x > 800.0) {
-      checkx = 800.0; 
+    if(body_get_velocity(affected).x > 600.0) {
+      checkx = 600.0; 
     }
     double checky = body_get_velocity(affected).y;
-    if(body_get_velocity(affected).y > 800.0) {
-      checky = 800.0;
+    if(body_get_velocity(affected).y > 600.0) {
+      checky = 600.0;
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
@@ -673,6 +665,33 @@ void draw_scoreboard(state_t *state) {
   render_scoreboard(player1score, player2score); 
 }
 
+void render_powerup_sprite(state_t *state) {
+  SDL_Surface *powerup; 
+  switch(*(state->powerup_available)) {
+    case X2_PUCK_VEL_INFO_C:
+      powerup = DOUBLEVEL_P;
+      break;
+    case X2_PLAYER_ACC_INFO_C:
+      powerup = DOUBLEACC_P;
+      break;
+    case X2_NEXT_GOAL_INFO_C:
+      powerup = DOUBLEGOAL_P;
+      break;
+    case FREEZE_ENEMY_INFO_C:
+      powerup = FREEZE_P;
+      break;
+    case HALF_ENEMY_ACC_INFO_C:
+      powerup = HALFACC_P;
+      break; 
+    default:
+      powerup = NULL; 
+  }
+  if(powerup != NULL) {
+    body_t *powerup_body = list_get(get_bodies_by_type(state->scene, state->powerup_available), 0); 
+    sdl_make_sprite(powerup, powerup_body, POWERUP_RADIUS); 
+  }
+}
+
 state_t *emscripten_init() {
   srand(time(NULL));
   sdl_init(VEC_ZERO, (vector_t){X_SIZE, Y_SIZE});
@@ -691,6 +710,7 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
+  state->powerup_available = NULL; 
   PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
@@ -706,6 +726,11 @@ state_t *emscripten_init() {
   SCORE5 = IMG_Load("assets/score5.png");
   SCORE6 = IMG_Load("assets/score6.png");
   SCORE7 = IMG_Load("assets/score7.png");
+  DOUBLEACC_P = IMG_Load("assets/doubleacc.png");
+  DOUBLEGOAL_P = IMG_Load("assets/doublegoal.png");
+  DOUBLEVEL_P = IMG_Load("assets/doublevel.png");
+  FREEZE_P = IMG_Load("assets/freeze.png");
+  HALFACC_P = IMG_Load("assets/halfaccel.png");
   sdl_on_key((key_handler_t)vel_key_handler_func);
   return state;
 }
@@ -736,6 +761,7 @@ void emscripten_main(state_t *state) {
   }
   speed_limit(state);
   powerup_collide(state);
+  wall_sounds(state);
   check_player_1_boundary(state);
   check_player_2_boundary(state);
   change_player_designations(state);
@@ -747,6 +773,9 @@ void emscripten_main(state_t *state) {
   render_circle_sprites(state);
   draw_scoreboard(state);
   sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
+  if(state->powerup_available != NULL) {
+    render_powerup_sprite(state); 
+  }
 }
 
 void emscripten_free(state_t *state) {
