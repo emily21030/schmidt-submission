@@ -300,7 +300,7 @@ void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
   rect.y = position.y - radius * get_scene_scale(get_window_center());
   rect.w = (radius * 2) * get_scene_scale(get_window_center());
   rect.h = (radius * 2) * get_scene_scale(get_window_center());
-  int sdlrc = SDL_RenderCopy(renderer, image_texture, NULL, &rect);
+  SDL_RenderCopy(renderer, image_texture, NULL, &rect);
   SDL_RenderPresent(renderer); 
 }
 

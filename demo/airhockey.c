@@ -80,6 +80,9 @@ char *X2_PLAYER_ACC_INFO = "a";
 char *HALF_ENEMY_ACC_INFO = "e";
 char *FREEZE_ENEMY_INFO = "f";
 
+char *INDICATOR_1_INFO = "i";
+char *INDICATOR_2_INFO = "j";
+
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
@@ -398,7 +401,14 @@ void initialize_puck(state_t *state) {
     }
   }
 }
-
+/*
+void initialize_indicators(state_t *state) {
+  body_t *p1_indicator = make_circle(10, YELLOW, (vector_t) {900.0, 500.0}, POWERUP_RADIUS, INDICATOR_1_INFO);
+  body_t *p2_indicator = make_circle(10, YELLOW, (vector_t) {1100.0, 500.0}, POWERUP_RADIUS, INDICATOR_2_INFO); 
+  scene_add_body(state->scene, p1_indicator);
+  scene_add_body(state->scene, p2_indicator); 
+}
+*/
 char* rand_powerup() {
   int num = rand_between(0, 5); 
   switch(num) {
@@ -691,6 +701,87 @@ void render_powerup_sprite(state_t *state) {
     sdl_make_sprite(powerup, powerup_body, POWERUP_RADIUS); 
   }
 }
+/*
+void render_indicator_sprite(state_t *state) {
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  SDL_Surface *powerup; 
+  switch(*(state->powerup_active)) {
+    case X2_PUCK_VEL_INFO_C:
+      powerup = DOUBLEVEL_P;
+      break;
+    case X2_PLAYER_ACC_INFO_C:
+      powerup = DOUBLEACC_P;
+      break;
+    case X2_NEXT_GOAL_INFO_C:
+      powerup = DOUBLEGOAL_P;
+      break;
+    case FREEZE_ENEMY_INFO_C:
+      powerup = FREEZE_P;
+      break;
+    case HALF_ENEMY_ACC_INFO_C:
+      powerup = HALFACC_P;
+      break; 
+    default:
+      powerup = NULL; 
+  }
+  body_t *indicator1 = list_get(get_bodies_by_type(state->scene, INDICATOR_1_INFO), 0);
+  body_t *indicator2 = list_get(get_bodies_by_type(state->scene, INDICATOR_2_INFO), 0);
+  if(state->powerup_affects == puck) {
+    sdl_make_sprite(powerup, indicator1, POWERUP_RADIUS);
+    sdl_make_sprite(powerup, indicator2, POWERUP_RADIUS);
+  }
+  else if(state->powerup_affects == player1) {
+    sdl_make_sprite(powerup, indicator1, POWERUP_RADIUS);
+  }
+  else if(state->powerup_affects == player2) {
+    sdl_make_sprite(powerup, indicator2, POWERUP_RADIUS);
+  }
+}
+*/
+
+void render_powerup_message(state_t *state) {
+  if(state->powerup_active == NULL) {
+    return; 
+  }
+  if(strcmp(state->powerup_active, X2_NEXT_GOAL_INFO) == 0) {
+    sdl_render_text("Next goal worth double!", PACIFICO, RGB_BLACK, (vector_t) {500, 800});
+    return;
+  }
+  char *message;
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  if(state->powerup_affects == puck) {
+    message = "Puck is ";
+  }
+  else if(state->powerup_affects == player1) {
+    message = "Player 1 is ";
+  }
+  else if(state->powerup_affects == player2) {
+    message = "Player 2 is ";
+  }
+  switch(*(state->powerup_active)) {
+    case X2_PUCK_VEL_INFO_C:
+      strcat(message, "extra fast!");
+      break;
+    case X2_PLAYER_ACC_INFO_C:
+      strcat(message, "zooming!");
+      break;
+    case FREEZE_ENEMY_INFO_C:
+      strcat(message, "real cold!");
+      break;
+    case HALF_ENEMY_ACC_INFO_C:
+      strcat(message, "real slow!");
+      break; 
+    default:
+      return; 
+  }
+  if(message != NULL) {
+    sdl_render_text(message, PACIFICO, RGB_BLACK, (vector_t) {500, 800});
+  }  
+}
 
 state_t *emscripten_init() {
   srand(time(NULL));
@@ -775,6 +866,10 @@ void emscripten_main(state_t *state) {
   sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
   if(state->powerup_available != NULL) {
     render_powerup_sprite(state); 
+  }
+  if(state->powerup_active != NULL) {
+    //render_indicator_sprite(state);
+    render_powerup_message(state); 
   }
   sdl_clear();
 }
