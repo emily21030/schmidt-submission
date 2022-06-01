@@ -124,6 +124,7 @@ typedef struct state {
   int player_2_score;
   double time_passed;
   powerup_func powerup; 
+  bool paused;
 } state_t;
 
 int rand_between(int lower, int upper) {
@@ -191,7 +192,7 @@ void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
   body_set_velocity(body, new_velocity);  
 }
 
-void vel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
   body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
@@ -226,6 +227,9 @@ void vel_key_handler_func(state_t *state, char key_pressed, key_event_type_t eve
   }
   if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
     body_set_velocity(player_2, VEC_ZERO);
+  }
+  if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+    state->paused = !(state->paused);
   }
   body_set_velocity(player_1, new_vel_1);
   body_set_velocity(player_2, new_vel_2);
@@ -264,6 +268,13 @@ void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t e
   }
   if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
     body_set_velocity(player_2, VEC_ZERO);
+  }
+}
+
+void pause_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+    state->paused = !(state->paused);
   }
 }
 
@@ -426,6 +437,11 @@ char* rand_powerup() {
     default:
       return FREEZE_ENEMY_INFO; 
   }
+}
+
+void check_pause(state_t *state) {
+  sdl_render_text("Game paused", PACIFICO, RGB_BLACK, (vector_t){500.0, 100.0}); 
+  sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, (vector_t){500.0, 500.0});
 }
 
 void check_win(state_t *state) {
@@ -803,6 +819,7 @@ state_t *emscripten_init() {
   state->player_2_score = 0;
   state->time_passed = 0.0; 
   state->powerup_available = NULL; 
+  state->paused = false;
   PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
@@ -823,8 +840,8 @@ state_t *emscripten_init() {
   DOUBLEVEL_P = IMG_Load("assets/doublevel.png");
   FREEZE_P = IMG_Load("assets/freeze.png");
   HALFACC_P = IMG_Load("assets/halfaccel.png");
-  FIELD = IMG_Load("assets/grid.png");
-  sdl_on_key((key_handler_t)vel_key_handler_func);
+  FIELD = IMG_Load("assets/air_hockey_table_yeah_yeah.png");
+  sdl_on_key((key_handler_t)key_handler_func);
   return state;
 }
 
@@ -852,27 +869,32 @@ void emscripten_main(state_t *state) {
       printf("Powerup deactivated! \n");
     }
   }
-  speed_limit(state);
-  powerup_collide(state);
-  wall_sounds(state);
-  check_player_1_boundary(state);
-  check_player_2_boundary(state);
-  change_player_designations(state);
-  scene_tick(state->scene, dt);
-  speed_limit(state);
-  check_goal(state);
-  check_win(state);
-  sdl_render_scene(state->scene);
-  sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
-  render_circle_sprites(state);
-  draw_scoreboard(state);
-  sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
-  if(state->powerup_available != NULL) {
-    render_powerup_sprite(state); 
+  if (!(state->paused)) {
+    speed_limit(state);
+    powerup_collide(state);
+    wall_sounds(state);
+    check_player_1_boundary(state);
+    check_player_2_boundary(state);
+    change_player_designations(state);
+    scene_tick(state->scene, dt);
+    speed_limit(state);
+    check_goal(state);
+    check_win(state);
+    sdl_render_scene(state->scene);
+    sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
+    render_circle_sprites(state);
+    draw_scoreboard(state);
+    sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
+    if(state->powerup_available != NULL) {
+      render_powerup_sprite(state); 
+    }
+    if(state->powerup_active != NULL) {
+      //render_indicator_sprite(state);
+      render_powerup_message(state); 
+    }
   }
-  if(state->powerup_active != NULL) {
-    //render_indicator_sprite(state);
-    render_powerup_message(state); 
+  else {
+    check_pause(state);
   }
   sdl_clear();
 }
