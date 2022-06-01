@@ -447,10 +447,12 @@ void check_pause(state_t *state) {
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
     sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){500.0, 300.0}); 
+    Mix_HaltMusic();
     SDL_Delay(1500); 
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
     sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){500.0, 300.0}); 
+    Mix_HaltMusic();
     SDL_Delay(1500); 
     exit(0);
   }
@@ -478,14 +480,12 @@ void check_goal(state_t *state) {
     body_set_velocity(puck, VEC_ZERO);
     Mix_PlayChannel(-1, GOAL_SOUND, 0); 
     reset_positions(state); 
-    printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
     state->player_2_score = state->player_2_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
     body_set_velocity(puck, VEC_ZERO);
     Mix_PlayChannel(-1, GOAL_SOUND, 0); 
     reset_positions(state); 
-    printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   }
 }
 
@@ -631,23 +631,43 @@ void speed_limit(state_t *state) {
   body_t *affected = state->powerup_affects; 
   if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0 || strcmp(state->powerup_active, X2_PUCK_VEL_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(body_get_velocity(affected).x > 600.0) {
-      checkx = 600.0; 
+    if(fabs(body_get_velocity(affected).x) > 600.0) {
+      if(body_get_velocity(affected).x > 0) {
+        checkx = 600.0; 
+      }
+      else if(body_get_velocity(affected).x < 0) {
+        checkx = -600.0; 
+      }
     }
     double checky = body_get_velocity(affected).y;
-    if(body_get_velocity(affected).y > 600.0) {
-      checky = 600.0;
+    if(fabs(body_get_velocity(affected).y) > 600.0) {
+      if(body_get_velocity(affected).y > 0) {
+        checky = 600.0; 
+      }
+      else if(body_get_velocity(affected).y < 0) {
+        checky = -600.0; 
+      }
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
   else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(body_get_velocity(affected).x > 200.0) {
-      checkx = 200.0; 
+    if(fabs(body_get_velocity(affected).x) > 200.0) {
+      if(body_get_velocity(affected).x > 0) {
+        checkx = 200.0; 
+      }
+      else if(body_get_velocity(affected).x < 0) {
+        checkx = -200.0; 
+      }
     }
     double checky = body_get_velocity(affected).y;
-    if(body_get_velocity(affected).y > 200.0) {
-      checky = 200.0;
+    if(fabs(body_get_velocity(affected).y) > 200.0) {
+      if(body_get_velocity(affected).y > 0) {
+        checky = 200.0; 
+      }
+      else if(body_get_velocity(affected).y < 0) {
+        checky = -200.0; 
+      }
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
@@ -719,52 +739,13 @@ void render_powerup_sprite(state_t *state) {
   }
 }
 /*
-void render_indicator_sprite(state_t *state) {
-  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
-  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  SDL_Surface *powerup; 
-  switch(*(state->powerup_active)) {
-    case X2_PUCK_VEL_INFO_C:
-      powerup = DOUBLEVEL_P;
-      break;
-    case X2_PLAYER_ACC_INFO_C:
-      powerup = DOUBLEACC_P;
-      break;
-    case X2_NEXT_GOAL_INFO_C:
-      powerup = DOUBLEGOAL_P;
-      break;
-    case FREEZE_ENEMY_INFO_C:
-      powerup = FREEZE_P;
-      break;
-    case HALF_ENEMY_ACC_INFO_C:
-      powerup = HALFACC_P;
-      break; 
-    default:
-      powerup = NULL; 
-  }
-  body_t *indicator1 = list_get(get_bodies_by_type(state->scene, INDICATOR_1_INFO), 0);
-  body_t *indicator2 = list_get(get_bodies_by_type(state->scene, INDICATOR_2_INFO), 0);
-  if(state->powerup_affects == puck) {
-    sdl_make_sprite(powerup, indicator1, POWERUP_RADIUS);
-    sdl_make_sprite(powerup, indicator2, POWERUP_RADIUS);
-  }
-  else if(state->powerup_affects == player1) {
-    sdl_make_sprite(powerup, indicator1, POWERUP_RADIUS);
-  }
-  else if(state->powerup_affects == player2) {
-    sdl_make_sprite(powerup, indicator2, POWERUP_RADIUS);
-  }
-}
-*/
-
 void render_powerup_message(state_t *state) {
   if(state->powerup_active == NULL) {
     return; 
   }
   if(strcmp(state->powerup_active, X2_NEXT_GOAL_INFO) == 0) {
-    sdl_render_text("Next goal worth double!", PACIFICO, RGB_BLACK, (vector_t) {500, 800});
-    return;
+    char *str = "Double goal! ";
+    sdl_render_text(str, PACIFICO, RGB_BLACK, (vector_t) {500, 800});
   }
   char *message;
   body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
@@ -780,25 +761,26 @@ void render_powerup_message(state_t *state) {
     message = "Player 2 is ";
   }
   switch(*(state->powerup_active)) {
+    printf("here! \n");
     case X2_PUCK_VEL_INFO_C:
-      strcat(message, "extra fast!");
+      message = strcat(message, "extra fast! ");
       break;
     case X2_PLAYER_ACC_INFO_C:
-      strcat(message, "zooming!");
+      message = strcat(message, "zooming! ");
       break;
     case FREEZE_ENEMY_INFO_C:
-      strcat(message, "real cold!");
+      message = strcat(message, "real cold! ");
       break;
     case HALF_ENEMY_ACC_INFO_C:
-      strcat(message, "real slow!");
+      message = strcat(message, "real slow! ");
       break; 
     default:
       return; 
   }
   if(message != NULL) {
-    sdl_render_text(message, PACIFICO, RGB_BLACK, (vector_t) {500, 800});
+    sdl_render_text(message, PACIFICO, RGB_BLACK, (vector_t) {500, 0});
   }  
-}
+}*/
 
 state_t *emscripten_init() {
   srand(time(NULL));
@@ -883,17 +865,19 @@ void emscripten_main(state_t *state) {
     check_goal(state);
     check_win(state);
     sdl_render_scene(state->scene);
+    sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
     sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
     render_circle_sprites(state);
     draw_scoreboard(state);
-    sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
     if(state->powerup_available != NULL) {
       render_powerup_sprite(state); 
-    }
+    }/*
     if(state->powerup_active != NULL) {
-      //render_indicator_sprite(state);
       render_powerup_message(state); 
     }
+    if(state->powerup_active == NULL) {
+      sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
+    }*/
   }
   else {
     check_pause(state);

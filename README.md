@@ -238,3 +238,12 @@ with the walls we created as bodies
 **BUGS:** None! 
 
 **RESOURCES USED:** None.
+
+## Wednesday, 6/01, 9:30am - 10:30am
+**WHO:** Roy
+
+**WHAT:** Fixed the mach 10 puck. 
+
+**BUGS:** None! 
+
+**RESOURCES USED:** None.
