@@ -211,10 +211,10 @@ numerous warnings regarding our info types instead - now we no longer have warni
 
 **RESOURCES USED:** None.
 
-## Tuesday, 5/31 10:00pm - 11:00pm
+## Tuesday, 5/31 10:00pm - 11:30pm
 **WHO:** Emily, Kaushik, and Avi
 
-**WHAT:** PAUSE! Next, we will put in a pause text screen and a menu!
+**WHAT:** PAUSE with a pause screen! Next, we will put in a menu!
 
 **BUGS:** Nah
 

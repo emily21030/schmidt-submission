@@ -269,7 +269,7 @@ Module.expectedDataFileDownloads++;
    "end": 16758054
   } ],
   "remote_package_size": 16758054,
-  "package_uuid": "c3120a97-c45a-4ace-93c6-3b4a51d72256"
+  "package_uuid": "1b1bdad9-e696-4f38-a4fe-2ee4d9e1194d"
  });
 })();
 
@@ -1870,7 +1870,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 307241865: function($0, $1, $2) {
+ 307242057: function($0, $1, $2) {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -1942,7 +1942,7 @@ var ASM_CONSTS = {
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
   return 0;
  },
- 307243344: function($0, $1, $2, $3, $4) {
+ 307243536: function($0, $1, $2, $3, $4) {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -1979,18 +1979,18 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 307244333: function($0) {
+ 307244525: function($0) {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
   return 0;
  },
- 307244426: function() {
+ 307244618: function() {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 307244495: function() {
+ 307244687: function() {
   if (typeof AudioContext !== "undefined") {
    return 1;
   } else if (typeof webkitAudioContext !== "undefined") {
@@ -1998,7 +1998,7 @@ var ASM_CONSTS = {
   }
   return 0;
  },
- 307244632: function() {
+ 307244824: function() {
   if (typeof navigator.mediaDevices !== "undefined" && typeof navigator.mediaDevices.getUserMedia !== "undefined") {
    return 1;
   } else if (typeof navigator.webkitGetUserMedia !== "undefined") {
@@ -2006,7 +2006,7 @@ var ASM_CONSTS = {
   }
   return 0;
  },
- 307244856: function($0) {
+ 307245048: function($0) {
   if (typeof Module["SDL2"] === "undefined") {
    Module["SDL2"] = {};
   }
@@ -2028,11 +2028,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 307245349: function() {
+ 307245541: function() {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 307245417: function($0, $1, $2, $3) {
+ 307245609: function($0, $1, $2, $3) {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -2073,7 +2073,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 307247069: function($0, $1, $2, $3) {
+ 307247261: function($0, $1, $2, $3) {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -2085,7 +2085,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 307247479: function($0, $1) {
+ 307247671: function($0, $1) {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -2104,7 +2104,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 307248084: function($0, $1) {
+ 307248276: function($0, $1) {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -2117,7 +2117,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 307248564: function($0) {
+ 307248756: function($0) {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -2155,28 +2155,28 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 307249736: function() {
+ 307249928: function() {
   return window.innerWidth;
  },
- 307249766: function() {
+ 307249958: function() {
   return window.innerHeight;
  },
- 307249797: function() {
+ 307249989: function() {
   return withBuiltinMalloc(function() {
    return allocateUTF8(Module["ASAN_OPTIONS"] || 0);
   });
  },
- 307249894: function() {
+ 307250086: function() {
   return withBuiltinMalloc(function() {
    return allocateUTF8(Module["LSAN_OPTIONS"] || 0);
   });
  },
- 307249991: function() {
+ 307250183: function() {
   return withBuiltinMalloc(function() {
    return allocateUTF8(Module["UBSAN_OPTIONS"] || 0);
   });
  },
- 307250089: function() {
+ 307250281: function() {
   var setting = Module["printWithColors"];
   if (setting != null) {
    return setting;
@@ -9810,10 +9810,21 @@ var dynCall_ddjj = Module["dynCall_ddjj"] = createExportWrapper("dynCall_ddjj");
 
 var dynCall_jii = Module["dynCall_jii"] = createExportWrapper("dynCall_jii");
 
-function invoke_ii(index, a1) {
+function invoke_viiii(index, a1, a2, a3, a4) {
  var sp = stackSave();
  try {
-  return getWasmTableEntry(index)(a1);
+  getWasmTableEntry(index)(a1, a2, a3, a4);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0) throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_iii(index, a1, a2) {
+ var sp = stackSave();
+ try {
+  return getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0) throw e;
@@ -9854,10 +9865,10 @@ function invoke_vi(index, a1) {
  }
 }
 
-function invoke_iii(index, a1, a2) {
+function invoke_ii(index, a1) {
  var sp = stackSave();
  try {
-  return getWasmTableEntry(index)(a1, a2);
+  return getWasmTableEntry(index)(a1);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0) throw e;
@@ -9924,17 +9935,6 @@ function invoke_i(index) {
  var sp = stackSave();
  try {
   return getWasmTableEntry(index)();
- } catch (e) {
-  stackRestore(sp);
-  if (e !== e + 0) throw e;
-  _setThrew(1, 0);
- }
-}
-
-function invoke_viiii(index, a1, a2, a3, a4) {
- var sp = stackSave();
- try {
-  getWasmTableEntry(index)(a1, a2, a3, a4);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0) throw e;
