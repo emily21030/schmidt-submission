@@ -205,7 +205,7 @@ numerous warnings regarding our info types instead - now we no longer have warni
 ## Tuesday, 5/31 7:00pm - 8:30pm
 **WHO:** Roy 
 
-**WHAT:** Tried making some sort of powerup indicator. And tried freeing everything. 
+**WHAT:** Tried making some sort of powerup indicator. And tried freeing everything. The solution was to put in a grid that let us see where things were. 
 
 **BUGS:** No matter what, indicator refuses to show, and the walls instead turn invisible (they aren't removed, they literally just disappear). These are two entities that have absolutely no correlation with one another. 
 
@@ -227,5 +227,14 @@ numerous warnings regarding our info types instead - now we no longer have warni
 
 **BUGS:** None! everything looks good and the drawn walls appear to line up exactly
 with the walls we created as bodies
+
+**RESOURCES USED:** None.
+
+## Wednesday, 6/01, 8:00am - 8:30am
+**WHO:** Roy
+
+**WHAT:** Put in background music, and freed everything in emcripten_free. 
+
+**BUGS:** None! 
 
 **RESOURCES USED:** None.

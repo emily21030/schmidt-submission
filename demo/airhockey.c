@@ -841,6 +841,8 @@ state_t *emscripten_init() {
   FREEZE_P = IMG_Load("assets/freeze.png");
   HALFACC_P = IMG_Load("assets/halfaccel.png");
   FIELD = IMG_Load("assets/air_hockey_table_yeah_yeah.png");
+  BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.wav");
+  Mix_PlayMusic(BACKGROUND_MUSIC, -1);
   sdl_on_key((key_handler_t)key_handler_func);
   return state;
 }
@@ -916,6 +918,11 @@ void emscripten_free(state_t *state) {
   SDL_FreeSurface(DOUBLEGOAL_P);
   SDL_FreeSurface(FREEZE_P);
   SDL_FreeSurface(HALFACC_P);
+  SDL_FreeSurface(FIELD);
+  Mix_FreeChunk(BOUNCE_SOUND);
+  Mix_FreeChunk(POWERUP_SOUND);
+  Mix_FreeChunk(GOAL_SOUND);
+  Mix_FreeMusic(BACKGROUND_MUSIC);
   Mix_CloseAudio();
   TTF_CloseFont(PACIFICO);
   scene_free(state->scene);
