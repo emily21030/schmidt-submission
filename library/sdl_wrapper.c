@@ -289,6 +289,8 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   text.h = text_height;
   SDL_RenderCopy(renderer, textTexture, NULL, &text);
   SDL_RenderPresent(renderer); 
+  SDL_DestroyTexture(textTexture);
+  SDL_FreeSurface(textSurface);
 }
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
@@ -302,6 +304,7 @@ void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
   rect.h = (radius * 2) * get_scene_scale(get_window_center());
   SDL_RenderCopy(renderer, image_texture, NULL, &rect);
   SDL_RenderPresent(renderer); 
+  SDL_DestroyTexture(image_texture);
 }
 
 void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
@@ -320,4 +323,6 @@ void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
   SDL_RenderCopy(renderer, texture1, NULL, &rect1);
   SDL_RenderCopy(renderer, texture2, NULL, &rect2);
   SDL_RenderPresent(renderer); 
+  SDL_DestroyTexture(texture1);
+  SDL_DestroyTexture(texture2);
 }
