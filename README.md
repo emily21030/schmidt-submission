@@ -205,7 +205,7 @@ numerous warnings regarding our info types instead - now we no longer have warni
 ## Tuesday, 5/31 7:00pm - 8:30pm
 **WHO:** Roy 
 
-**WHAT:** Tried making some sort of powerup indicator. 
+**WHAT:** Tried making some sort of powerup indicator. And tried freeing everything. 
 
 **BUGS:** No matter what, indicator refuses to show, and the walls instead turn invisible (they aren't removed, they literally just disappear). These are two entities that have absolutely no correlation with one another. 
 
