@@ -840,7 +840,7 @@ state_t *emscripten_init() {
   DOUBLEVEL_P = IMG_Load("assets/doublevel.png");
   FREEZE_P = IMG_Load("assets/freeze.png");
   HALFACC_P = IMG_Load("assets/halfaccel.png");
-  FIELD = IMG_Load("assets/grid.png");
+  FIELD = IMG_Load("assets/air_hockey_table_yeah_yeah.png");
   sdl_on_key((key_handler_t)key_handler_func);
   return state;
 }

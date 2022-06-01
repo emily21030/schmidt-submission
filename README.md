@@ -219,3 +219,13 @@ numerous warnings regarding our info types instead - now we no longer have warni
 **BUGS:** Nah
 
 **RESOURCES USED:** None.
+
+## Tuesday, 5/31, 11:30pm-12:00am
+**WHO:** Kaushik
+
+**WHAT:** Drew a table for the game (Canada-themed, of course)!
+
+**BUGS:** None! everything looks good and the drawn walls appear to line up exactly
+with the walls we created as bodies
+
+**RESOURCES USED:** None.
