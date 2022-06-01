@@ -107,6 +107,7 @@ SDL_Surface *DOUBLEGOAL_P;
 SDL_Surface *DOUBLEVEL_P;
 SDL_Surface *FREEZE_P;
 SDL_Surface *HALFACC_P; 
+SDL_Surface *FIELD;
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -822,6 +823,7 @@ state_t *emscripten_init() {
   DOUBLEVEL_P = IMG_Load("assets/doublevel.png");
   FREEZE_P = IMG_Load("assets/freeze.png");
   HALFACC_P = IMG_Load("assets/halfaccel.png");
+  FIELD = IMG_Load("assets/grid.png");
   sdl_on_key((key_handler_t)vel_key_handler_func);
   return state;
 }
@@ -861,6 +863,7 @@ void emscripten_main(state_t *state) {
   check_goal(state);
   check_win(state);
   sdl_render_scene(state->scene);
+  sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
   render_circle_sprites(state);
   draw_scoreboard(state);
   sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 

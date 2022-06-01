@@ -143,6 +143,8 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh);
 
-void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2); 
+void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2);
+
+void sdl_make_table(SDL_Surface *image, vector_t center, int w, int h);
 
 #endif // #ifndef __SDL_WRAPPER_H__

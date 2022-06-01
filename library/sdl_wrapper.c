@@ -293,6 +293,18 @@ void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t p
   SDL_FreeSurface(textSurface);
 }
 
+void sdl_make_table(SDL_Surface *image, vector_t position, int w, int h) {
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
+  SDL_Rect rect;
+  rect.x = position.x * get_scene_scale(get_window_center());
+  rect.y = position.y * get_scene_scale(get_window_center());
+  rect.w = w * get_scene_scale(get_window_center());
+  rect.h = h * get_scene_scale(get_window_center()); 
+  SDL_RenderCopy(renderer, texture, NULL, &rect);
+  SDL_RenderPresent(renderer);
+  SDL_DestroyTexture(texture); 
+}
+
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
   SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer, image);
   vector_t center = body_get_centroid(body); 
