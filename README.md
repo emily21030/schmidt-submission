@@ -210,3 +210,12 @@ numerous warnings regarding our info types instead - now we no longer have warni
 **BUGS:** No matter what, indicator refuses to show, and the walls instead turn invisible (they aren't removed, they literally just disappear). These are two entities that have absolutely no correlation with one another. 
 
 **RESOURCES USED:** None.
+
+## Tuesday, 5/31 10:00pm - 11:00pm
+**WHO:** Emily, Kaushik, and Avi
+
+**WHAT:** PAUSE! Next, we will put in a pause text screen and a menu!
+
+**BUGS:** Nah
+
+**RESOURCES USED:** None.

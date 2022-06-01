@@ -124,6 +124,7 @@ typedef struct state {
   int player_2_score;
   double time_passed;
   powerup_func powerup; 
+  bool paused;
 } state_t;
 
 int rand_between(int lower, int upper) {
@@ -227,6 +228,9 @@ void vel_key_handler_func(state_t *state, char key_pressed, key_event_type_t eve
   if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
     body_set_velocity(player_2, VEC_ZERO);
   }
+  if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+    state->paused = !(state->paused);
+  }
   body_set_velocity(player_1, new_vel_1);
   body_set_velocity(player_2, new_vel_2);
 }
@@ -264,6 +268,13 @@ void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t e
   }
   if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
     body_set_velocity(player_2, VEC_ZERO);
+  }
+}
+
+void pause_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+    state->paused = !(state->paused);
   }
 }
 
@@ -803,6 +814,7 @@ state_t *emscripten_init() {
   state->player_2_score = 0;
   state->time_passed = 0.0; 
   state->powerup_available = NULL; 
+  state->paused = false;
   PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
@@ -852,16 +864,18 @@ void emscripten_main(state_t *state) {
       printf("Powerup deactivated! \n");
     }
   }
-  speed_limit(state);
-  powerup_collide(state);
-  wall_sounds(state);
-  check_player_1_boundary(state);
-  check_player_2_boundary(state);
-  change_player_designations(state);
-  scene_tick(state->scene, dt);
-  speed_limit(state);
-  check_goal(state);
-  check_win(state);
+  if (!(state->paused)) {
+    speed_limit(state);
+    powerup_collide(state);
+    wall_sounds(state);
+    check_player_1_boundary(state);
+    check_player_2_boundary(state);
+    change_player_designations(state);
+    scene_tick(state->scene, dt);
+    speed_limit(state);
+    check_goal(state);
+    check_win(state);
+  }
   sdl_render_scene(state->scene);
   sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
   render_circle_sprites(state);
