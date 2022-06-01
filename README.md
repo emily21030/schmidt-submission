@@ -247,3 +247,13 @@ with the walls we created as bodies
 **BUGS:** None! 
 
 **RESOURCES USED:** None.
+
+## Wednesday, 6/01, 3:00pm - 4:00pm
+**WHO:** Kaushik and Avi
+
+**WHAT:** Designed instruction screen and menu screen as images that will be displayed when
+instructions are requested.
+
+**BUGS:** I don't think there are any, but let's hope it doesn't look ugly in-game.
+
+**RESOURCES USED:** None.
