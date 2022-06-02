@@ -241,49 +241,6 @@ void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_t
   body_set_velocity(player_2, new_vel_2);
 }
 
-void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
-  if (keyboard_states[SDL_SCANCODE_W]) {
-    key_handler_func_helper(dt, player_1, UP_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_A]) {
-    key_handler_func_helper(dt, player_1, LEFT_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_S]) {
-    key_handler_func_helper(dt, player_1, DOWN_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_D]) {
-    key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_UP]) {
-    key_handler_func_helper(dt, player_2, UP_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_LEFT]) {
-    key_handler_func_helper(dt, player_2, LEFT_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_DOWN]) {
-    key_handler_func_helper(dt, player_2, DOWN_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_RIGHT]) {
-    key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
-    body_set_velocity(player_1, VEC_ZERO);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
-    body_set_velocity(player_2, VEC_ZERO);
-  }
-}
-
-void pause_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
-  if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
-    state->paused = !(state->paused);
-  }
-}
-
 void check_player_1_boundary(state_t *state) {
   body_t *player = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   vector_t curr_centroid = body_get_centroid(player);

@@ -275,3 +275,12 @@ instructions are requested.
 **BUGS:** None. 
 
 **RESOURCES USED:** Stack Overflow to resolve warnings. 
+
+## Thursday, 6/02, 2:30pm - 3:00pm
+**WHO:** Kaushik 
+
+**WHAT:** Cleaned up demo code a bit.
+
+**BUGS:** None. 
+
+**RESOURCES USED:** None 
