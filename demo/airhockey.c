@@ -23,7 +23,7 @@ const double GOAL_WIDTH = 200.0;
 const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
 
-const vector_t MESSAGE_COORDS = (vector_t) {600.0, 0.0};
+const vector_t MESSAGE_COORDS = (vector_t) {500.0, 0.0};
 const vector_t WIN_MESSAGE_COORDS = (vector_t){600.0, 300.0};
 const vector_t PAUSE_MESSAGE_COORDS = (vector_t){600.0, 100.0};
 
@@ -850,7 +850,6 @@ void emscripten_main(state_t *state) {
       state->powerup_active = NULL;
       state->powerup_affects = NULL;
       state->powerup_time = 0.0; 
-      printf("Powerup deactivated! \n");
     }
   }
   if (!(state->paused)) {
