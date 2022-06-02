@@ -257,3 +257,12 @@ instructions are requested.
 **BUGS:** I don't think there are any, but let's hope it doesn't look ugly in-game.
 
 **RESOURCES USED:** None.
+
+## Wednesday, 6/01, 9:00pm - 10:30pm
+**WHO:** Roy
+
+**WHAT:** Made a powerup indicator in the form of a message. 
+
+**BUGS:** None.
+
+**RESOURCES USED:** None.

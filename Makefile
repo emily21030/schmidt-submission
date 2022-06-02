@@ -70,7 +70,7 @@ STUDENT_OBJS = $(addprefix out/,$(STUDENT_LIBS:=.o))
 WASM_STUDENT_OBJS = $(addprefix out/,$(STUDENT_LIBS:=.wasm.o))
 
 # List of test suite executables, e.g. "bin/test_suite_vector"
-TEST_BINS = $(addprefix bin/test_suite_,$(STUDENT_LIBS))
+# TEST_BINS = $(addprefix bin/test_suite_,$(STUDENT_LIBS))
 # List of demo executables, i.e. "bin/bounce.html".
 DEMO_BINS = $(addsuffix .html, $(addprefix bin/,$(DEMOS)))
 
@@ -78,7 +78,8 @@ DEMO_BINS = $(addsuffix .html, $(addprefix bin/,$(DEMOS)))
 # It builds the files in TEST_BINS and DEMO_BINS, as well as making the server for the demos
 # "To build 'all', make sure all files in TEST_BINS and DEMO_BINS are up to date."
 # You can execute this rule by running the command "make all", or just "make".
-all: $(TEST_BINS) $(DEMO_BINS) server
+# all: $(TEST_BINS) $(DEMO_BINS) server
+all: $(DEMO_BINS) server
 
 # Make the python server for your demos
 # To run this, type 'make server'

@@ -413,14 +413,7 @@ void initialize_puck(state_t *state) {
     }
   }
 }
-/*
-void initialize_indicators(state_t *state) {
-  body_t *p1_indicator = make_circle(10, YELLOW, (vector_t) {900.0, 500.0}, POWERUP_RADIUS, INDICATOR_1_INFO);
-  body_t *p2_indicator = make_circle(10, YELLOW, (vector_t) {1100.0, 500.0}, POWERUP_RADIUS, INDICATOR_2_INFO); 
-  scene_add_body(state->scene, p1_indicator);
-  scene_add_body(state->scene, p2_indicator); 
-}
-*/
+
 char* rand_powerup() {
   int num = rand_between(0, 5); 
   switch(num) {
@@ -738,49 +731,52 @@ void render_powerup_sprite(state_t *state) {
     sdl_make_sprite(powerup, powerup_body, POWERUP_RADIUS); 
   }
 }
-/*
+
+char *make_message(state_t *state) {
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  char *message;
+  if(state->powerup_affects == puck) {
+    message = "Puck is extra fast!";
+  }
+  else if(state->powerup_affects == player1) {
+    if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0) {
+      message = "Player 1 is zooming!";
+    }
+    else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
+      message = "Player 1 is slow!";
+    }
+    else if(strcmp(state->powerup_active, FREEZE_ENEMY_INFO) == 0){
+      message = "Player 1 is frozen!";
+    }
+  }
+  else if(state->powerup_affects == player2) {
+    if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0) {
+      message = "Player 2 is zooming!";
+    }
+    else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
+      message = "Player 2 is slow!";
+    }
+    else if(strcmp(state->powerup_active, FREEZE_ENEMY_INFO) == 0){
+      message = "Player 2 is frozen!";
+    }
+  }
+  if(strcmp(state->powerup_active, X2_NEXT_GOAL_INFO) == 0) {
+    message = "Double points!";
+  }
+  return message != NULL ? message : "Canada, eh?!"; 
+}
+
 void render_powerup_message(state_t *state) {
   if(state->powerup_active == NULL) {
     return; 
   }
-  if(strcmp(state->powerup_active, X2_NEXT_GOAL_INFO) == 0) {
-    char *str = "Double goal! ";
-    sdl_render_text(str, PACIFICO, RGB_BLACK, (vector_t) {500, 800});
-  }
-  char *message;
-  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
-  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  if(state->powerup_affects == puck) {
-    message = "Puck is ";
-  }
-  else if(state->powerup_affects == player1) {
-    message = "Player 1 is ";
-  }
-  else if(state->powerup_affects == player2) {
-    message = "Player 2 is ";
-  }
-  switch(*(state->powerup_active)) {
-    printf("here! \n");
-    case X2_PUCK_VEL_INFO_C:
-      message = strcat(message, "extra fast! ");
-      break;
-    case X2_PLAYER_ACC_INFO_C:
-      message = strcat(message, "zooming! ");
-      break;
-    case FREEZE_ENEMY_INFO_C:
-      message = strcat(message, "real cold! ");
-      break;
-    case HALF_ENEMY_ACC_INFO_C:
-      message = strcat(message, "real slow! ");
-      break; 
-    default:
-      return; 
-  }
+  char *message = make_message(state); 
   if(message != NULL) {
     sdl_render_text(message, PACIFICO, RGB_BLACK, (vector_t) {500, 0});
   }  
-}*/
+}
 
 state_t *emscripten_init() {
   srand(time(NULL));
@@ -802,7 +798,7 @@ state_t *emscripten_init() {
   state->time_passed = 0.0; 
   state->powerup_available = NULL; 
   state->paused = false;
-  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); 
+  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 50); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
   POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
@@ -865,19 +861,18 @@ void emscripten_main(state_t *state) {
     check_goal(state);
     check_win(state);
     sdl_render_scene(state->scene);
-    sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
     sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
     render_circle_sprites(state);
     draw_scoreboard(state);
     if(state->powerup_available != NULL) {
       render_powerup_sprite(state); 
-    }/*
+    }
     if(state->powerup_active != NULL) {
       render_powerup_message(state); 
     }
     if(state->powerup_active == NULL) {
       sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
-    }*/
+    }
   }
   else {
     check_pause(state);
