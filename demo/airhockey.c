@@ -25,7 +25,8 @@ const double REC_WIDTH = 100.0;
 
 const vector_t MESSAGE_COORDS = (vector_t) {500.0, 0.0};
 const vector_t WIN_MESSAGE_COORDS = (vector_t){600.0, 300.0};
-const vector_t PAUSE_MESSAGE_COORDS = (vector_t){600.0, 100.0};
+const vector_t PAUSE_MESSAGE_COORDS_UPPER = (vector_t){600.0, 100.0};
+const vector_t PAUSE_MESSAGE_COORDS_LOWER = (vector_t){500.0, 400.0};
 
 const rgb_color_t RGB_GRAY = {0.5, 0.5, 0.5};
 const rgb_color_t RGB_BLACK = {0.0, 0.0, 0.0};
@@ -437,8 +438,8 @@ char* rand_powerup() {
 }
 
 void check_pause(state_t *state) {
-  sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS); 
-sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS);
+  sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_UPPER); 
+  sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWER);
 }
 
 void check_win(state_t *state) {
