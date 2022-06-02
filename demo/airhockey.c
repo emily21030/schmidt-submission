@@ -20,9 +20,13 @@ const double X_ORIGIN = 0;
 const double Y_ORIGIN = 0;
 const double WALL_THICKNESS = 20.0;
 const double GOAL_WIDTH = 200.0;
-
 const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
+
+const vector_t MESSAGE_COORDS = (vector_t) {600.0, 0.0};
+const vector_t WIN_MESSAGE_COORDS = (vector_t){600.0, 300.0};
+const vector_t PAUSE_MESSAGE_COORDS = (vector_t){600.0, 100.0};
+
 const rgb_color_t RGB_GRAY = {0.5, 0.5, 0.5};
 const rgb_color_t RGB_BLACK = {0.0, 0.0, 0.0};
 const rgb_color_t RGB_WHITE = {1.0, 1.0, 1.0};
@@ -47,8 +51,8 @@ const vector_t UP_VEL = {0, 250};
 const vector_t DOWN_VEL = {0, -250};
 const vector_t LEFT_VEL = {-250, 0};
 const vector_t RIGHT_VEL = {250, 0};
-const double MIN_VEL = 150.0;
-const double MAX_VEL = 400.0;
+const double MIN_VEL = 200.0;
+const double MAX_VEL = 600.0;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int POWERUP_RADIUS = 20; 
@@ -195,7 +199,7 @@ void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
 void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
   body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
   vector_t new_vel_1 = {0, 0};
   vector_t new_vel_2 = {0, 0};
   if (keyboard_states[SDL_SCANCODE_W]) {
@@ -238,7 +242,7 @@ void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_t
 void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
   body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
   if (keyboard_states[SDL_SCANCODE_W]) {
     key_handler_func_helper(dt, player_1, UP_ACCEL);
   }
@@ -272,7 +276,7 @@ void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t e
 }
 
 void pause_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
+  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
   if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
     state->paused = !(state->paused);
   }
@@ -433,18 +437,18 @@ char* rand_powerup() {
 }
 
 void check_pause(state_t *state) {
-  sdl_render_text("Game paused", PACIFICO, RGB_BLACK, (vector_t){500.0, 100.0}); 
-  sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, (vector_t){500.0, 500.0});
+  sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS); 
+sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS);
 }
 
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, (vector_t){500.0, 300.0}); 
+    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
     SDL_Delay(1500); 
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, (vector_t){500.0, 300.0}); 
+    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
     SDL_Delay(1500); 
     exit(0);
@@ -624,42 +628,42 @@ void speed_limit(state_t *state) {
   body_t *affected = state->powerup_affects; 
   if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0 || strcmp(state->powerup_active, X2_PUCK_VEL_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(fabs(body_get_velocity(affected).x) > 600.0) {
-      if(body_get_velocity(affected).x > 0) {
-        checkx = 600.0; 
+    if (fabs(body_get_velocity(affected).x) > MAX_VEL) {
+      if (body_get_velocity(affected).x > 0) {
+        checkx = MAX_VEL; 
       }
-      else if(body_get_velocity(affected).x < 0) {
-        checkx = -600.0; 
+      else if (body_get_velocity(affected).x < 0) {
+        checkx = -MAX_VEL; 
       }
     }
     double checky = body_get_velocity(affected).y;
-    if(fabs(body_get_velocity(affected).y) > 600.0) {
+    if(fabs(body_get_velocity(affected).y) > MAX_VEL) {
       if(body_get_velocity(affected).y > 0) {
-        checky = 600.0; 
+        checky = MAX_VEL; 
       }
       else if(body_get_velocity(affected).y < 0) {
-        checky = -600.0; 
+        checky = -MAX_VEL; 
       }
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
   else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(fabs(body_get_velocity(affected).x) > 200.0) {
+    if(fabs(body_get_velocity(affected).x) > MIN_VEL) {
       if(body_get_velocity(affected).x > 0) {
-        checkx = 200.0; 
+        checkx = MIN_VEL; 
       }
       else if(body_get_velocity(affected).x < 0) {
-        checkx = -200.0; 
+        checkx = -MIN_VEL; 
       }
     }
     double checky = body_get_velocity(affected).y;
-    if(fabs(body_get_velocity(affected).y) > 200.0) {
+    if(fabs(body_get_velocity(affected).y) > MIN_VEL) {
       if(body_get_velocity(affected).y > 0) {
-        checky = 200.0; 
+        checky = MIN_VEL; 
       }
       else if(body_get_velocity(affected).y < 0) {
-        checky = -200.0; 
+        checky = -MIN_VEL; 
       }
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
@@ -774,7 +778,7 @@ void render_powerup_message(state_t *state) {
   }
   char *message = make_message(state); 
   if(message != NULL) {
-    sdl_render_text(message, PACIFICO, RGB_BLACK, (vector_t) {500, 0});
+    sdl_render_text(message, PACIFICO, RGB_BLACK, MESSAGE_COORDS);
   }  
 }
 
@@ -871,7 +875,7 @@ void emscripten_main(state_t *state) {
       render_powerup_message(state); 
     }
     if(state->powerup_active == NULL) {
-      sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
+      sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, MESSAGE_COORDS); 
     }
   }
   else {

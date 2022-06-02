@@ -266,3 +266,12 @@ instructions are requested.
 **BUGS:** None.
 
 **RESOURCES USED:** None.
+
+## Thursday, 6/02, 2:00am - 3:00am
+**WHO:** Avi 
+
+**WHAT:** Removed magic numbers and some pesky warnings. 
+
+**BUGS:** None. 
+
+**RESOURCES USED:** Stack Overflow to resolve warnings. 
