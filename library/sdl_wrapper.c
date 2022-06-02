@@ -338,3 +338,15 @@ void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
   SDL_DestroyTexture(texture1);
   SDL_DestroyTexture(texture2);
 }
+
+void render_background(SDL_Surface *background) {
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, background); 
+  SDL_Rect rect;
+  rect.x = 0;
+  rect.y = 0;
+  rect.w = WINDOW_WIDTH;
+  rect.h = WINDOW_HEIGHT;
+  SDL_RenderCopy(renderer, texture, NULL, &rect);
+  SDL_RenderPresent(renderer);
+  SDL_DestroyTexture(texture); 
+}

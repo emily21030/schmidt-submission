@@ -147,4 +147,6 @@ void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2);
 
 void sdl_make_table(SDL_Surface *image, vector_t center, int w, int h);
 
+void render_background(SDL_Surface *background);
+
 #endif // #ifndef __SDL_WRAPPER_H__

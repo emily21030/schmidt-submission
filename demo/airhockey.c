@@ -113,6 +113,7 @@ SDL_Surface *DOUBLEVEL_P;
 SDL_Surface *FREEZE_P;
 SDL_Surface *HALFACC_P; 
 SDL_Surface *FIELD;
+SDL_Surface *BACKGROUND;
 
 typedef void (*powerup_func)(state_t *state); 
 
@@ -824,6 +825,7 @@ state_t *emscripten_init() {
   FREEZE_P = IMG_Load("assets/freeze.png");
   HALFACC_P = IMG_Load("assets/halfaccel.png");
   FIELD = IMG_Load("assets/air_hockey_table_yeah_yeah.png");
+  BACKGROUND = IMG_Load("assets/background.png");
   BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.wav");
   Mix_PlayMusic(BACKGROUND_MUSIC, -1);
   sdl_on_key((key_handler_t)key_handler_func);
@@ -865,6 +867,7 @@ void emscripten_main(state_t *state) {
     check_goal(state);
     check_win(state);
     sdl_render_scene(state->scene);
+    render_background(BACKGROUND); 
     sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
     render_circle_sprites(state);
     draw_scoreboard(state);
