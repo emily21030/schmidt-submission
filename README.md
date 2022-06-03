@@ -313,3 +313,30 @@ think about how to do that.
 **BUGS:** None! We're... done??
 
 **RESOURCES USED:** None
+
+## Friday, 6/03, 9:00am - 9:30am
+**WHO:** Roy 
+
+**WHAT:** Code cleanup, magic numbers. 
+
+**BUGS:** None! 
+
+**RESOURCES USED:** None
+
+## Thursday, 6/03, 11:00am - 12:30pm
+**WHO:** Avi 
+
+**WHAT:** Added option to exit to menu from the pause screen. Also, the game resets to the menu when it ends, instead of exiting. 
+
+**BUGS:** The player win message no longer gets displayed... can someone figure this out please and thanks. 
+
+**RESOURCES USED:** None
+
+## Thursday, 6/03, 12:00pm - 1:15pm
+**WHO:** Roy 
+
+**WHAT:** Remade menu screens with better art
+
+**BUGS:** None. Message is not displayed due to some sort of async issue. 
+
+**RESOURCES USED:** None
