@@ -26,10 +26,11 @@ const vector_t TABLE_CENTER = (vector_t) {310.0, 210.0};
 const int TABLE_WIDTH = 980.0;
 const int TABLE_HEIGHT = 480.0; 
 
-const vector_t MESSAGE_COORDS = (vector_t) {500.0, 0.0};
+const vector_t MESSAGE_COORDS = (vector_t) {550.0, 0.0};
 const vector_t WIN_MESSAGE_COORDS = (vector_t){600.0, 300.0};
 const vector_t PAUSE_MESSAGE_COORDS_UPPER = (vector_t){600.0, 100.0};
-const vector_t PAUSE_MESSAGE_COORDS_LOWER = (vector_t){500.0, 400.0};
+const vector_t PAUSE_MESSAGE_COORDS_LOWER = (vector_t){500.0, 300.0};
+const vector_t PAUSE_MESSAGE_COORDS_LOWEST = (vector_t) {400.0, 500.0};
 
 const rgb_color_t RGB_GRAY = {0.5, 0.5, 0.5};
 const rgb_color_t RGB_BLACK = {0.0, 0.0, 0.0};
@@ -198,79 +199,6 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
   return body_list;
 }
 
-void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  body_t *player_1;
-  body_t *player_2;
-  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
-  switch(state->current_screen) {
-    case GAME:
-      player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-      player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-      vector_t new_vel_1 = {0, 0};
-      vector_t new_vel_2 = {0, 0};
-      if (keyboard_states[SDL_SCANCODE_W]) {
-        new_vel_1 = vec_add(new_vel_1, UP_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_A]) {
-        new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_S]) {
-        new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_D]) {
-        new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_UP]) {
-        new_vel_2 = vec_add(new_vel_2, UP_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_LEFT]) {
-        new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_DOWN]) {
-        new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
-      }
-      if (keyboard_states[SDL_SCANCODE_RIGHT]) {
-        new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
-      }
-      if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
-        body_set_velocity(player_1, VEC_ZERO);
-      }
-      if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
-        body_set_velocity(player_2, VEC_ZERO);
-      }
-      if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
-        state->paused = !(state->paused);
-      }
-      body_set_velocity(player_1, new_vel_1);
-      body_set_velocity(player_2, new_vel_2);
-      break;
-    case MENU:
-      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
-        state->current_screen = COLORS;
-      }
-      else if (keyboard_states[SDL_SCANCODE_I] && event_type == KEY_PRESSED) {
-        state->current_screen = INFO;
-      }
-      break;
-    case COLORS:
-      if (keyboard_states[SDL_SCANCODE_1] && event_type == KEY_PRESSED) {
-        state->current_screen = GAME;
-        state->color_choice = 1; 
-      }
-      else if (keyboard_states[SDL_SCANCODE_2] && event_type == KEY_PRESSED) {
-        state->current_screen = GAME;
-        state->color_choice = 2; 
-      }
-      break;
-    case INFO:
-      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
-        state->current_screen = COLORS;
-      }
-      if (keyboard_states[SDL_SCANCODE_M] && event_type == KEY_PRESSED) {
-        state->current_screen = MENU;
-      }
-  }
-}
 
 void check_player_1_boundary(state_t *state) {
   body_t *player = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
@@ -430,6 +358,36 @@ void check_pause(state_t *state) {
   render_background(BACKGROUND);
   sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_UPPER); 
   sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWER);
+  sdl_render_text("Press 'M' to to exit to menu", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWEST);
+}
+
+void reset_positions(state_t *state) {
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
+  body_set_centroid(player1, (vector_t) {PADDING + WALL_THICKNESS + (X_TABLE / 4), (Y_TABLE / 2) + PADDING});
+  body_set_centroid(player2, (vector_t) {X_SIZE - PADDING - WALL_THICKNESS - (X_TABLE / 4), (Y_TABLE / 2) + PADDING}); 
+  body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING}); 
+  body_set_velocity(player1, VEC_ZERO);
+  body_set_velocity(player2, VEC_ZERO);
+  body_set_velocity(puck, VEC_ZERO);
+  state->ppg = PPG;
+  state->powerup_active = NULL;
+  state->powerup_time = 0.0;
+  state->powerup_affects = NULL; 
+  state->powerup = NULL; 
+}
+
+void reset_all(state_t *state) {
+  reset_positions(state);
+  state->last_touched = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  state->other_player = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  state->player_1_score = 0;
+  state->player_2_score = 0;
+  state->time_passed = 0.0; 
+  state->powerup_available = NULL; 
+  state->paused = false;
+  Mix_PlayMusic(BACKGROUND_MUSIC, -1);
 }
 
 void check_win(state_t *state) {
@@ -437,29 +395,94 @@ void check_win(state_t *state) {
     render_background(BACKGROUND);
     sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
-    SDL_Delay(1500); 
-    exit(0);
+    SDL_Delay(30); 
+    exit(0); 
   } else if (state->player_2_score >= WIN_THRESHOLD) {
     render_background(BACKGROUND);
     sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
-    SDL_Delay(1500);
+    SDL_Delay(30);
     exit(0);
   }
 }
 
-void reset_positions(state_t *state) {
-  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  body_set_centroid(player1, (vector_t) {PADDING + WALL_THICKNESS + (X_TABLE / 4), (Y_TABLE / 2) + PADDING});
-  body_set_centroid(player2, (vector_t) {X_SIZE - PADDING - WALL_THICKNESS - (X_TABLE / 4), (Y_TABLE / 2) + PADDING}); 
-  body_set_velocity(player1, VEC_ZERO);
-  body_set_velocity(player2, VEC_ZERO);
-  state->ppg = PPG;
-  state->powerup_active = NULL;
-  state->powerup_time = 0.0;
-  state->powerup_affects = NULL; 
-  state->powerup = NULL; 
+void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+  body_t *player_1;
+  body_t *player_2;
+  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
+  switch(state->current_screen) {
+    case GAME:
+      player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+      player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+      vector_t new_vel_1 = {0, 0};
+      vector_t new_vel_2 = {0, 0};
+      if (keyboard_states[SDL_SCANCODE_W]) {
+        new_vel_1 = vec_add(new_vel_1, UP_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_A]) {
+        new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_S]) {
+        new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_D]) {
+        new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_UP]) {
+        new_vel_2 = vec_add(new_vel_2, UP_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_LEFT]) {
+        new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_DOWN]) {
+        new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_RIGHT]) {
+        new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
+      }
+      if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
+        body_set_velocity(player_1, VEC_ZERO);
+      }
+      if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
+        body_set_velocity(player_2, VEC_ZERO);
+      }
+      if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+        state->paused = !(state->paused);
+      }
+      if (keyboard_states[SDL_SCANCODE_M] && event_type == KEY_PRESSED && state->paused) {
+        Mix_HaltMusic();
+        state->current_screen = MENU;
+        reset_all(state);
+      }
+      body_set_velocity(player_1, new_vel_1);
+      body_set_velocity(player_2, new_vel_2);
+      break;
+    case MENU:
+      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
+        state->current_screen = COLORS;
+      }
+      else if (keyboard_states[SDL_SCANCODE_I] && event_type == KEY_PRESSED) {
+        state->current_screen = INFO;
+      }
+      break;
+    case COLORS:
+      if (keyboard_states[SDL_SCANCODE_1] && event_type == KEY_PRESSED) {
+        state->current_screen = GAME;
+        state->color_choice = 1; 
+      }
+      else if (keyboard_states[SDL_SCANCODE_2] && event_type == KEY_PRESSED) {
+        state->current_screen = GAME;
+        state->color_choice = 2; 
+      }
+      break;
+    case INFO:
+      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
+        state->current_screen = COLORS;
+      }
+      if (keyboard_states[SDL_SCANCODE_M] && event_type == KEY_PRESSED) {
+        state->current_screen = MENU;
+      }
+  }
 }
 
 void check_goal(state_t *state) {
