@@ -340,3 +340,12 @@ think about how to do that.
 **BUGS:** None. Message is not displayed due to some sort of async issue. 
 
 **RESOURCES USED:** None
+
+## Thursday, 6/03, 1:30pm - 3:30pm
+**WHO:** Roy and Kaushik
+ 
+**WHAT:** Merge request + fixing up aftermath
+
+**BUGS:** None. Dwai. 
+
+**RESOURCES USED:** None
