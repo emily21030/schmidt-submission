@@ -278,7 +278,19 @@ double time_since_last_tick(void) {
   return difference;
 }
 
-void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position) {
+void render_texture(SDL_Texture *texture, int x, int y, int w, int h) {
+  SDL_Rect rect;
+  rect.x = x;
+  rect.y = y;
+  rect.w = w;
+  rect.h = h;
+  int sdlrc = SDL_RenderCopy(renderer, texture, NULL, &rect);
+  if (sdlrc != 0) {
+    printf("RENDER COPY FAILED \n"); 
+  }
+}
+
+SDL_Texture *make_text(char *string, TTF_Font *font, rgb_color_t color) {
   SDL_Color textColor = {color.r * 255.0, color.g * 255.0, color.b * 255.0};
   SDL_Surface *textSurface = TTF_RenderText_Solid(font, string, textColor); 
   SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
@@ -308,7 +320,7 @@ void sdl_make_table(SDL_Surface *image, vector_t position, int w, int h) {
 }
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
-  SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer, image);
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
   vector_t center = body_get_centroid(body); 
   vector_t position = get_window_position(center, get_window_center()); 
   SDL_Rect rect;
