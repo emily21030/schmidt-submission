@@ -313,3 +313,12 @@ think about how to do that.
 **BUGS:** None! We're... done??
 
 **RESOURCES USED:** None
+
+## Thursday, 6/03, 11:00am - 12:30pm
+**WHO:** Avi 
+
+**WHAT:** Added option to exit to menu from the pause screen. Also, the game resets to the menu when it ends, instead of exiting. 
+
+**BUGS:** The player win message no longer gets displayed... can someone figure this out please and thanks. 
+
+**RESOURCES USED:** None
