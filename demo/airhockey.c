@@ -821,9 +821,9 @@ state_t *emscripten_init() {
   DOUBLEVEL_P = IMG_Load("assets/doublevel.png");
   FREEZE_P = IMG_Load("assets/freeze.png");
   HALFACC_P = IMG_Load("assets/halfaccel.png");
-  MENU_SCREEN = IMG_Load("assets/menu_screen.png");
-  INFO_SCREEN = IMG_Load("assets/info_screen.png");
-  COLOR_SELECTION_SCREEN = IMG_Load("assets/color_screen.png");
+  MENU_SCREEN = IMG_Load("assets/menuscreen.png");
+  INFO_SCREEN = IMG_Load("assets/infoscreen.png");
+  COLOR_SELECTION_SCREEN = IMG_Load("assets/colorscreen.png");
   FIELD = IMG_Load("assets/air_hockey_table_yeah_yeah.png");
   BACKGROUND = IMG_Load("assets/background.png");
   BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.wav");
