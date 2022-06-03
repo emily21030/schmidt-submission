@@ -204,7 +204,7 @@ Module['FS_createPath']("/", "assets", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/assets/grid.png", "start": 0, "end": 6150}, {"filename": "/assets/score6.png", "start": 6150, "end": 19642}, {"filename": "/assets/puck.png", "start": 19642, "end": 64490}, {"filename": "/assets/score1.png", "start": 64490, "end": 77917}, {"filename": "/assets/score4.png", "start": 77917, "end": 88189}, {"filename": "/assets/color_screen.png", "start": 88189, "end": 518152}, {"filename": "/assets/bounce.wav", "start": 518152, "end": 567938, "audio": 1}, {"filename": "/assets/doubleacc.png", "start": 567938, "end": 583394}, {"filename": "/assets/air_hockey_table_yeah_yeah.png", "start": 583394, "end": 598111}, {"filename": "/assets/score7.png", "start": 598111, "end": 606839}, {"filename": "/assets/halfaccel.png", "start": 606839, "end": 651189}, {"filename": "/assets/doublegoal.png", "start": 651189, "end": 662275}, {"filename": "/assets/freeze.png", "start": 662275, "end": 675849}, {"filename": "/assets/goal.wav", "start": 675849, "end": 814319, "audio": 1}, {"filename": "/assets/score3.png", "start": 814319, "end": 836374}, {"filename": "/assets/score0.png", "start": 836374, "end": 843936}, {"filename": "/assets/doublevel.png", "start": 843936, "end": 859018}, {"filename": "/assets/inkcircle.png", "start": 859018, "end": 1272101}, {"filename": "/assets/score2.png", "start": 1272101, "end": 1295408}, {"filename": "/assets/menu_screen.png", "start": 1295408, "end": 1550639}, {"filename": "/assets/bpaddle.png", "start": 1550639, "end": 1877187}, {"filename": "/assets/Pacifico.ttf", "start": 1877187, "end": 1952755}, {"filename": "/assets/rpaddle.png", "start": 1952755, "end": 2129364}, {"filename": "/assets/info_screen.png", "start": 2129364, "end": 2575446}, {"filename": "/assets/bkgmus.wav", "start": 2575446, "end": 17742578, "audio": 1}, {"filename": "/assets/background.png", "start": 17742578, "end": 17783396}, {"filename": "/assets/powerup.wav", "start": 17783396, "end": 17903290, "audio": 1}, {"filename": "/assets/score5.png", "start": 17903290, "end": 17913176}], "remote_package_size": 17913176, "package_uuid": "a8abaa0c-d13a-4bbb-bf67-3d707a363184"});
+    loadPackage({"files": [{"filename": "/assets/grid.png", "start": 0, "end": 6150}, {"filename": "/assets/score6.png", "start": 6150, "end": 19642}, {"filename": "/assets/puck.png", "start": 19642, "end": 64490}, {"filename": "/assets/score1.png", "start": 64490, "end": 77917}, {"filename": "/assets/score4.png", "start": 77917, "end": 88189}, {"filename": "/assets/color_screen.png", "start": 88189, "end": 518152}, {"filename": "/assets/bounce.wav", "start": 518152, "end": 567938, "audio": 1}, {"filename": "/assets/doubleacc.png", "start": 567938, "end": 583394}, {"filename": "/assets/air_hockey_table_yeah_yeah.png", "start": 583394, "end": 598111}, {"filename": "/assets/score7.png", "start": 598111, "end": 606839}, {"filename": "/assets/halfaccel.png", "start": 606839, "end": 651189}, {"filename": "/assets/doublegoal.png", "start": 651189, "end": 662275}, {"filename": "/assets/freeze.png", "start": 662275, "end": 675849}, {"filename": "/assets/goal.wav", "start": 675849, "end": 814319, "audio": 1}, {"filename": "/assets/score3.png", "start": 814319, "end": 836374}, {"filename": "/assets/score0.png", "start": 836374, "end": 843936}, {"filename": "/assets/doublevel.png", "start": 843936, "end": 859018}, {"filename": "/assets/inkcircle.png", "start": 859018, "end": 1272101}, {"filename": "/assets/score2.png", "start": 1272101, "end": 1295408}, {"filename": "/assets/menu_screen.png", "start": 1295408, "end": 1542524}, {"filename": "/assets/bpaddle.png", "start": 1542524, "end": 1869072}, {"filename": "/assets/Pacifico.ttf", "start": 1869072, "end": 1944640}, {"filename": "/assets/rpaddle.png", "start": 1944640, "end": 2121249}, {"filename": "/assets/info_screen.png", "start": 2121249, "end": 2567331}, {"filename": "/assets/bkgmus.wav", "start": 2567331, "end": 17734463, "audio": 1}, {"filename": "/assets/background.png", "start": 17734463, "end": 17775281}, {"filename": "/assets/powerup.wav", "start": 17775281, "end": 17895175, "audio": 1}, {"filename": "/assets/score5.png", "start": 17895175, "end": 17905061}], "remote_package_size": 17905061, "package_uuid": "5448178e-5486-4f39-b8ba-0880b38c81d1"});
 
   })();
 
@@ -9424,10 +9424,21 @@ var dynCall_ji = Module["dynCall_ji"] = createExportWrapper("dynCall_ji");
 var dynCall_iiji = Module["dynCall_iiji"] = createExportWrapper("dynCall_iiji");
 
 
-function invoke_ii(index,a1) {
+function invoke_viiii(index,a1,a2,a3,a4) {
   var sp = stackSave();
   try {
-    return getWasmTableEntry(index)(a1);
+    getWasmTableEntry(index)(a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_iii(index,a1,a2) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;
@@ -9468,10 +9479,10 @@ function invoke_vi(index,a1) {
   }
 }
 
-function invoke_iii(index,a1,a2) {
+function invoke_ii(index,a1) {
   var sp = stackSave();
   try {
-    return getWasmTableEntry(index)(a1,a2);
+    return getWasmTableEntry(index)(a1);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;
@@ -9538,17 +9549,6 @@ function invoke_i(index) {
   var sp = stackSave();
   try {
     return getWasmTableEntry(index)();
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0) throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_viiii(index,a1,a2,a3,a4) {
-  var sp = stackSave();
-  try {
-    getWasmTableEntry(index)(a1,a2,a3,a4);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;

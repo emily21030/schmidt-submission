@@ -293,4 +293,14 @@ selection screen and uploaded image to assets folder.
 
 **BUGS:** None. 
 
-**RESOURCES USED:** None 
+**RESOURCES USED:** None
+
+## Thursday, 6/02, 10:30pm - 11:30pm
+**WHO:** Kaushik 
+
+**WHAT:** Implemented navigation through menus.
+
+**BUGS:** Color selection doesn't actually allow the player to select their color. Need to
+think about how to do that. 
+
+**RESOURCES USED:** None
