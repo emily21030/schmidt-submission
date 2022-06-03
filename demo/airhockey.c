@@ -355,7 +355,7 @@ char* rand_powerup() {
 }
 
 void check_pause(state_t *state) {
-  rendeer_background(BACKGROUND);
+  render_background(BACKGROUND);
   sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_UPPER); 
   sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWER);
   sdl_render_text("Press 'M' to to exit to menu", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWEST);
@@ -392,14 +392,14 @@ void check_win(state_t *state) {
     render_background(BACKGROUND);
     sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
-    SDL_Delay(4000); 
+    SDL_Delay(2000); 
     state->current_screen = MENU;
     reset_all(state);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
     render_background(BACKGROUND);
     sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
-    SDL_Delay(4000);
+    SDL_Delay(2000);
     state->current_screen = MENU;
     reset_all(state);
   }
