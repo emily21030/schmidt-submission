@@ -23,7 +23,8 @@ typedef enum {
   D_KEY = 9,
   P_KEY = 10,
   M_KEY = 11,
-  G_KEY = 12
+  G_KEY = 12,
+  I_KEY = 13
 } arrow_key_t;
 
 /**

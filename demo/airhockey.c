@@ -197,59 +197,76 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
   return body_list;
 }
 
-void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
-  if (sqrt(vec_dot(body_get_velocity(body), body_get_velocity(body))) == 0) {
-    body_set_velocity(body, vec_multiply(MIN_VEL, unit_vector(acceleration)));
-    return;
-  }
-  vector_t new_velocity = vec_add(body_get_velocity(body), vec_multiply(dt, acceleration));
-  if (sqrt(vec_dot(new_velocity, new_velocity)) > MAX_VEL) {
-    new_velocity = vec_multiply(MAX_VEL, unit_vector(new_velocity));
-  } 
-  body_set_velocity(body, new_velocity);  
-}
-
 void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  body_t *player_1;
+  body_t *player_2;
   Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
-  vector_t new_vel_1 = {0, 0};
-  vector_t new_vel_2 = {0, 0};
-  if (keyboard_states[SDL_SCANCODE_W]) {
-    new_vel_1 = vec_add(new_vel_1, UP_VEL);
+  switch(state->current_screen) {
+    case GAME:
+      player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+      player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+      vector_t new_vel_1 = {0, 0};
+      vector_t new_vel_2 = {0, 0};
+      if (keyboard_states[SDL_SCANCODE_W]) {
+        new_vel_1 = vec_add(new_vel_1, UP_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_A]) {
+        new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_S]) {
+        new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_D]) {
+        new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_UP]) {
+        new_vel_2 = vec_add(new_vel_2, UP_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_LEFT]) {
+        new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_DOWN]) {
+        new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_RIGHT]) {
+        new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
+      }
+      if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
+        body_set_velocity(player_1, VEC_ZERO);
+      }
+      if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
+        body_set_velocity(player_2, VEC_ZERO);
+      }
+      if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+        state->paused = !(state->paused);
+      }
+      body_set_velocity(player_1, new_vel_1);
+      body_set_velocity(player_2, new_vel_2);
+      break;
+    case MENU:
+      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
+        state->current_screen = COLORS;
+      }
+      else if (keyboard_states[SDL_SCANCODE_I] && event_type == KEY_PRESSED) {
+        state->current_screen = INFO;
+      }
+      break;
+    case COLORS:
+      if (keyboard_states[SDL_SCANCODE_1] && event_type == KEY_PRESSED) {
+        state->current_screen = GAME;
+      }
+      else if (keyboard_states[SDL_SCANCODE_2] && event_type == KEY_PRESSED) {
+        state->current_screen = GAME;
+      }
+      break;
+    case INFO:
+      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
+        state->current_screen = COLORS;
+      }
+      if (keyboard_states[SDL_SCANCODE_M] && event_type == KEY_PRESSED) {
+        state->current_screen = MENU;
+      }
   }
-  if (keyboard_states[SDL_SCANCODE_A]) {
-    new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_S]) {
-    new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_D]) {
-    new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_UP]) {
-    new_vel_2 = vec_add(new_vel_2, UP_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_LEFT]) {
-    new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_DOWN]) {
-    new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_RIGHT]) {
-    new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
-    body_set_velocity(player_1, VEC_ZERO);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
-    body_set_velocity(player_2, VEC_ZERO);
-  }
-  if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
-    state->paused = !(state->paused);
-  }
-  body_set_velocity(player_1, new_vel_1);
-  body_set_velocity(player_2, new_vel_2);
 }
 
 void check_player_1_boundary(state_t *state) {
@@ -420,7 +437,7 @@ void check_win(state_t *state) {
   } else if (state->player_2_score >= WIN_THRESHOLD) {
     sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
-    SDL_Delay(1500); 
+    SDL_Delay(1500);
     exit(0);
   }
 }
@@ -771,6 +788,7 @@ state_t *emscripten_init() {
   state->player_2_score = 0;
   state->time_passed = 0.0; 
   state->powerup_available = NULL; 
+  state->current_screen = MENU;
   state->paused = false;
   PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 50); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
@@ -805,57 +823,70 @@ state_t *emscripten_init() {
 
 void emscripten_main(state_t *state) {
   double dt = time_since_last_tick();
-  if (dt > 0) {
-    state->time_passed += 1;
-    if (state->time_passed >= POWERUP_TIME && list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS && state->powerup_active == NULL) { //adjust this for powerup cap
-      add_powerup(state, rand_powerup()); 
-      state->time_passed = 0.0;
-    }
-  }
-  if (state->powerup_active) {
-    state->powerup_time += 1;
-    if(state->powerup_time <= POWERUP_TIME) {
-      (*state).powerup(state); 
-    }
-    else {
-      if(state->powerup_active == X2_NEXT_GOAL_INFO) {
-        state->ppg = PPG; 
+  switch(state->current_screen) {
+    case GAME:
+      if (dt > 0) {
+        state->time_passed += 1;
+        if (state->time_passed >= POWERUP_TIME && list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS && state->powerup_active == NULL) { //adjust this for powerup cap
+          add_powerup(state, rand_powerup()); 
+          state->time_passed = 0.0;
+        }
       }
-      state->powerup_active = NULL;
-      state->powerup_affects = NULL;
-      state->powerup_time = 0.0; 
-    }
+      if (state->powerup_active) {
+        state->powerup_time += 1;
+        if(state->powerup_time <= POWERUP_TIME) {
+          (*state).powerup(state); 
+        }
+        else {
+          if(state->powerup_active == X2_NEXT_GOAL_INFO) {
+            state->ppg = PPG; 
+          }
+          state->powerup_active = NULL;
+          state->powerup_affects = NULL;
+          state->powerup_time = 0.0; 
+        }
+      }
+      if (!(state->paused)) {
+        speed_limit(state);
+        powerup_collide(state);
+        wall_sounds(state);
+        check_player_1_boundary(state);
+        check_player_2_boundary(state);
+        change_player_designations(state);
+        scene_tick(state->scene, dt);
+        speed_limit(state);
+        check_goal(state);
+        check_win(state);
+        sdl_render_scene(state->scene);
+        render_background(BACKGROUND); 
+        sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
+        render_circle_sprites(state);
+        draw_scoreboard(state);
+        if(state->powerup_available != NULL) {
+          render_powerup_sprite(state); 
+        }
+        if(state->powerup_active != NULL) {
+          render_powerup_message(state); 
+        }
+        if(state->powerup_active == NULL) {
+          sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, MESSAGE_COORDS); 
+        }
+      }
+      else {
+        check_pause(state);
+      }
+      sdl_clear();
+      break;
+    case MENU:
+      render_background(MENU_SCREEN);
+      break;
+    case INFO:
+      render_background(INFO_SCREEN);
+      break;
+    case COLORS:
+      render_background(COLOR_SELECTION_SCREEN);
+      break;
   }
-  if (!(state->paused)) {
-    speed_limit(state);
-    powerup_collide(state);
-    wall_sounds(state);
-    check_player_1_boundary(state);
-    check_player_2_boundary(state);
-    change_player_designations(state);
-    scene_tick(state->scene, dt);
-    speed_limit(state);
-    check_goal(state);
-    check_win(state);
-    sdl_render_scene(state->scene);
-    render_background(BACKGROUND); 
-    sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
-    render_circle_sprites(state);
-    draw_scoreboard(state);
-    if(state->powerup_available != NULL) {
-      render_powerup_sprite(state); 
-    }
-    if(state->powerup_active != NULL) {
-      render_powerup_message(state); 
-    }
-    if(state->powerup_active == NULL) {
-      sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, MESSAGE_COORDS); 
-    }
-  }
-  else {
-    check_pause(state);
-  }
-  sdl_clear();
 }
 
 void emscripten_free(state_t *state) {
