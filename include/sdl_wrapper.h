@@ -142,9 +142,7 @@ double time_since_last_tick(void);
 
 void render_texture(SDL_Texture *texture, int x, int y, int w, int h);
 
-SDL_Texture *make_text(char *string, TTF_Font *font, rgb_color_t color);
-
-void sdl_render_text(SDL_Texture *texture, vector_t position);
+void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position);
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh);
 
