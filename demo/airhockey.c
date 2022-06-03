@@ -142,6 +142,7 @@ typedef struct state {
   powerup_func powerup; 
   bool paused;
   screen_t current_screen;
+  int color_choice;
 } state_t;
 
 int rand_between(int lower, int upper) {
@@ -254,9 +255,11 @@ void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_t
     case COLORS:
       if (keyboard_states[SDL_SCANCODE_1] && event_type == KEY_PRESSED) {
         state->current_screen = GAME;
+        state->color_choice = 1; 
       }
       else if (keyboard_states[SDL_SCANCODE_2] && event_type == KEY_PRESSED) {
         state->current_screen = GAME;
+        state->color_choice = 2; 
       }
       break;
     case INFO:
@@ -662,8 +665,14 @@ void render_circle_sprites(state_t *state) {
   body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   sdl_make_sprite(PUCK_IMG, puck, PUCK_RADIUS);
-  sdl_make_sprite(BLUE_PADDLE, player1, PADDLE_RADIUS);
-  sdl_make_sprite(RED_PADDLE, player2, PADDLE_RADIUS); 
+  if(state->color_choice == 2) {
+    sdl_make_sprite(RED_PADDLE, player1, PADDLE_RADIUS);
+    sdl_make_sprite(BLUE_PADDLE, player2, PADDLE_RADIUS); 
+  }
+  else {
+    sdl_make_sprite(BLUE_PADDLE, player1, PADDLE_RADIUS);
+    sdl_make_sprite(RED_PADDLE, player2, PADDLE_RADIUS); 
+  }
 }
 
 SDL_Surface *surface_from_score(int score) {
@@ -890,6 +899,9 @@ void emscripten_main(state_t *state) {
 }
 
 void emscripten_free(state_t *state) {
+  SDL_FreeSurface(MENU_SCREEN);
+  SDL_FreeSurface(INFO_SCREEN);
+  SDL_FreeSurface(COLOR_SELECTION_SCREEN);
   SDL_FreeSurface(PUCK_IMG);
   SDL_FreeSurface(BLUE_PADDLE);
   SDL_FreeSurface(RED_PADDLE);
@@ -907,6 +919,7 @@ void emscripten_free(state_t *state) {
   SDL_FreeSurface(FREEZE_P);
   SDL_FreeSurface(HALFACC_P);
   SDL_FreeSurface(FIELD);
+  SDL_FreeSurface(BACKGROUND);
   Mix_FreeChunk(BOUNCE_SOUND);
   Mix_FreeChunk(POWERUP_SOUND);
   Mix_FreeChunk(GOAL_SOUND);
