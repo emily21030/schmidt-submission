@@ -341,10 +341,10 @@ think about how to do that.
 
 **RESOURCES USED:** None
 
-## Thursday, 6/03, 1:30pm - 3:30pm
+## Thursday, 6/03, 1:30pm - 3:45pm
 **WHO:** Roy and Kaushik
  
-**WHAT:** Merge request + fixing up aftermath
+**WHAT:** Merge request + fixing up aftermath + done. 
 
 **BUGS:** None. Dwai. 
 
