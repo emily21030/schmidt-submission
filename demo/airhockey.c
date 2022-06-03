@@ -22,6 +22,9 @@ const double WALL_THICKNESS = 20.0;
 const double GOAL_WIDTH = 200.0;
 const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
+const vector_t TABLE_CENTER = (vector_t) {310.0, 210.0};
+const int TABLE_WIDTH = 980.0;
+const int TABLE_HEIGHT = 480.0; 
 
 const vector_t MESSAGE_COORDS = (vector_t) {500.0, 0.0};
 const vector_t WIN_MESSAGE_COORDS = (vector_t){600.0, 300.0};
@@ -44,10 +47,6 @@ const rgb_color_t PINK = {1.0, 0.0, 0.5};
 
 const double PADDLE_MASS = 5.0;
 const double PADDLE_RADIUS = 40;
-const vector_t UP_ACCEL = {0, 100};
-const vector_t DOWN_ACCEL = {0, -100};
-const vector_t LEFT_ACCEL = {-100, 0};
-const vector_t RIGHT_ACCEL = {100, 0};
 const vector_t UP_VEL = {0, 250};
 const vector_t DOWN_VEL = {0, -250};
 const vector_t LEFT_VEL = {-250, 0};
@@ -92,6 +91,7 @@ int PPG = 1;
 int PPG_POWERUP = 2; 
 
 TTF_Font *PACIFICO;
+const int FONTSIZE = 50;
 Mix_Music *BACKGROUND_MUSIC;
 Mix_Chunk *BOUNCE_SOUND;
 Mix_Chunk *GOAL_SOUND;
@@ -427,6 +427,7 @@ char* rand_powerup() {
 }
 
 void check_pause(state_t *state) {
+  rendeer_background(BACKGROUND);
   sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_UPPER); 
   sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWER);
 }
@@ -801,7 +802,7 @@ state_t *emscripten_init() {
   state->powerup_available = NULL; 
   state->current_screen = MENU;
   state->paused = false;
-  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 50); 
+  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", FONTSIZE); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
   POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
@@ -870,7 +871,7 @@ void emscripten_main(state_t *state) {
         check_win(state);
         sdl_render_scene(state->scene);
         render_background(BACKGROUND); 
-        sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
+        sdl_make_table(FIELD, TABLE_CENTER, TABLE_WIDTH, TABLE_HEIGHT);
         render_circle_sprites(state);
         draw_scoreboard(state);
         if(state->powerup_available != NULL) {

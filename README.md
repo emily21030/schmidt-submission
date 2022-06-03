@@ -313,3 +313,12 @@ think about how to do that.
 **BUGS:** None! We're... done??
 
 **RESOURCES USED:** None
+
+## Friday, 6/03, 9:00am - 9:30am
+**WHO:** Roy 
+
+**WHAT:** Code cleanup, magic numbers. 
+
+**BUGS:** None! 
+
+**RESOURCES USED:** None
