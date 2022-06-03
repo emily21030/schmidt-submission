@@ -60,7 +60,7 @@ const int POWERUP_MASS = 10;
 const int CIRCLE_SIDES = 40;
 const int WIN_THRESHOLD = 7;
 const int MAX_NUM_POWERUPS = 1;
-const double POWERUP_TIME = 500.0;
+const double POWERUP_TIME = 5.0;
 
 const char PLAYER_1_INFO_C = '1';
 const char PLAYER_2_INFO_C = '2';
@@ -838,14 +838,14 @@ void emscripten_main(state_t *state) {
   switch(state->current_screen) {
     case GAME:
       if (dt > 0) {
-        state->time_passed += 1;
+        state->time_passed += dt;
         if (state->time_passed >= POWERUP_TIME && list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS && state->powerup_active == NULL) { //adjust this for powerup cap
           add_powerup(state, rand_powerup()); 
           state->time_passed = 0.0;
         }
       }
       if (state->powerup_active) {
-        state->powerup_time += 1;
+        state->powerup_time += dt;
         if(state->powerup_time <= POWERUP_TIME) {
           (*state).powerup(state); 
         }
