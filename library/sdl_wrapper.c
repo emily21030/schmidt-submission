@@ -17,6 +17,8 @@ const int SCORE1_X = 200;
 const int SCORE1_Y = 10;
 const int SCORE2_X = 750;
 const int SCORE2_Y = 10;
+const int SCORE_W = 50; 
+const int SCORE_H = 100; 
 
 /**
  * The coordinate at the center of the screen.
@@ -117,6 +119,8 @@ char get_keycode(SDL_Keycode key) {
     return M_KEY;
   case SDLK_g:
     return G_KEY;
+  case SDLK_i:
+    return I_KEY;
   default:
     // Only process 7-bit ASCII characters
     return key == (SDL_Keycode)(char)key ? key : '\0';
@@ -286,44 +290,47 @@ void render_texture(SDL_Texture *texture, int x, int y, int w, int h) {
   }
 }
 
-SDL_Texture *make_text(char *string, TTF_Font *font, rgb_color_t color) {
+void sdl_render_text(char *string, TTF_Font *font, rgb_color_t color, vector_t position) {
   SDL_Color textColor = {color.r * 255.0, color.g * 255.0, color.b * 255.0};
-  SDL_Surface *surface = TTF_RenderText_Solid(font, string, textColor); 
-  if (surface == NULL) {
-    printf("TTF_RenderText error \n");
-    return NULL;
-  }
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (texture == NULL) {
-    printf("CreateTexture error \n");
-  }
-  SDL_FreeSurface(surface);
-  return texture;
-}
-
-void sdl_render_text(SDL_Texture *texture, vector_t position) {
-  /*text.x = 1500;
-  text.y = 1500;
-  text.w = 500;
-  text.h = 500;*/
+  SDL_Surface *textSurface = TTF_RenderText_Solid(font, string, textColor); 
+  SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+  int text_width = textSurface->w;
+  int text_height = textSurface->h;
+  SDL_Rect text;
   text.x = position.x * get_scene_scale(get_window_center());
   text.y = position.y * get_scene_scale(get_window_center());
   text.w = text_width;
   text.h = text_height;
   SDL_RenderCopy(renderer, textTexture, NULL, &text);
   SDL_RenderPresent(renderer); 
+  SDL_DestroyTexture(textTexture);
+  SDL_FreeSurface(textSurface);
+}
+
+void sdl_make_table(SDL_Surface *image, vector_t position, int w, int h) {
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
+  SDL_Rect rect;
+  rect.x = position.x * get_scene_scale(get_window_center());
+  rect.y = position.y * get_scene_scale(get_window_center());
+  rect.w = w * get_scene_scale(get_window_center());
+  rect.h = h * get_scene_scale(get_window_center()); 
+  SDL_RenderCopy(renderer, texture, NULL, &rect);
+  SDL_RenderPresent(renderer);
+  SDL_DestroyTexture(texture); 
 }
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double radius) {
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, image);
+  SDL_Texture *image_texture = SDL_CreateTextureFromSurface(renderer, image);
   vector_t center = body_get_centroid(body); 
   vector_t position = get_window_position(center, get_window_center()); 
-  int x = position.x - radius * get_scene_scale(get_window_center());
-  int y = position.y - radius * get_scene_scale(get_window_center());
-  int w = (radius * 2) * get_scene_scale(get_window_center());
-  int h = (radius * 2) * get_scene_scale(get_window_center());
-  render_texture(texture, x, y, w, h);
-  SDL_RenderPresent(renderer);
+  SDL_Rect rect;
+  rect.x = position.x - radius * get_scene_scale(get_window_center());
+  rect.y = position.y - radius * get_scene_scale(get_window_center());
+  rect.w = (radius * 2) * get_scene_scale(get_window_center());
+  rect.h = (radius * 2) * get_scene_scale(get_window_center());
+  SDL_RenderCopy(renderer, image_texture, NULL, &rect);
+  SDL_RenderPresent(renderer); 
+  SDL_DestroyTexture(image_texture);
 }
 
 void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
@@ -332,14 +339,28 @@ void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2) {
   SDL_Rect rect1;
   rect1.x = SCORE1_X;
   rect1.y = SCORE1_Y;
-  rect1.w = 50;
-  rect1.h = 100;
+  rect1.w = SCORE_W;
+  rect1.h = SCORE_H;
   SDL_Rect rect2;
   rect2.x = SCORE2_X;
   rect2.y = SCORE2_Y;
-  rect2.w = 50;
-  rect2.h = 100;
+  rect2.w = SCORE_W;
+  rect2.h = SCORE_H;
   SDL_RenderCopy(renderer, texture1, NULL, &rect1);
   SDL_RenderCopy(renderer, texture2, NULL, &rect2);
   SDL_RenderPresent(renderer); 
+  SDL_DestroyTexture(texture1);
+  SDL_DestroyTexture(texture2);
+}
+
+void render_background(SDL_Surface *background) {
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, background); 
+  SDL_Rect rect;
+  rect.x = 0;
+  rect.y = 0;
+  rect.w = WINDOW_WIDTH;
+  rect.h = WINDOW_HEIGHT;
+  SDL_RenderCopy(renderer, texture, NULL, &rect);
+  SDL_RenderPresent(renderer);
+  SDL_DestroyTexture(texture); 
 }

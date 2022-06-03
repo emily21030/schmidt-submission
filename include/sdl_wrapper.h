@@ -23,7 +23,8 @@ typedef enum {
   D_KEY = 9,
   P_KEY = 10,
   M_KEY = 11,
-  G_KEY = 12
+  G_KEY = 12,
+  I_KEY = 13
 } arrow_key_t;
 
 /**
@@ -147,6 +148,10 @@ void sdl_render_text(SDL_Texture *texture, vector_t position);
 
 void sdl_make_sprite(SDL_Surface *image, body_t *body, double wh);
 
-void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2); 
+void render_scoreboard(SDL_Surface *score1, SDL_Surface *score2);
+
+void sdl_make_table(SDL_Surface *image, vector_t center, int w, int h);
+
+void render_background(SDL_Surface *background);
 
 #endif // #ifndef __SDL_WRAPPER_H__

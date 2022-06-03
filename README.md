@@ -184,7 +184,7 @@ numerous warnings regarding our info types instead - now we no longer have warni
 
 **RESOURCES USED:** None.
 
-## Sunday, 5/30 9:30am - 10:30am
+## Monday, 5/30 9:30am - 10:30am
 **WHO:** Roy 
 
 **WHAT:** Made text. 
@@ -192,3 +192,124 @@ numerous warnings regarding our info types instead - now we no longer have warni
 **BUGS:** None!
 
 **RESOURCES USED:** SDL documentation.
+
+## Monday, 5/30 9:00pm - 10:30pm
+**WHO:** Roy 
+
+**WHAT:** Found and implemented powerup sprites. 
+
+**BUGS:** None!
+
+**RESOURCES USED:** None.
+
+## Tuesday, 5/31 7:00pm - 8:30pm
+**WHO:** Roy 
+
+**WHAT:** Tried making some sort of powerup indicator. And tried freeing everything. The solution was to put in a grid that let us see where things were. 
+
+**BUGS:** No matter what, indicator refuses to show, and the walls instead turn invisible (they aren't removed, they literally just disappear). These are two entities that have absolutely no correlation with one another. 
+
+**RESOURCES USED:** None.
+
+## Tuesday, 5/31 10:00pm - 11:30pm
+**WHO:** Emily, Kaushik, and Avi
+
+**WHAT:** PAUSE with a pause screen! Next, we will put in a menu!
+
+**BUGS:** Nah
+
+**RESOURCES USED:** None.
+
+## Tuesday, 5/31, 11:30pm-12:00am
+**WHO:** Kaushik
+
+**WHAT:** Drew a table for the game (Canada-themed, of course)!
+
+**BUGS:** None! everything looks good and the drawn walls appear to line up exactly
+with the walls we created as bodies
+
+**RESOURCES USED:** None.
+
+## Wednesday, 6/01, 8:00am - 8:30am
+**WHO:** Roy
+
+**WHAT:** Put in background music, and freed everything in emcripten_free. 
+
+**BUGS:** None! 
+
+**RESOURCES USED:** None.
+
+## Wednesday, 6/01, 9:30am - 10:30am
+**WHO:** Roy
+
+**WHAT:** Fixed the mach 10 puck. 
+
+**BUGS:** None! 
+
+**RESOURCES USED:** None.
+
+## Wednesday, 6/01, 3:00pm - 4:00pm
+**WHO:** Kaushik and Avi
+
+**WHAT:** Designed instruction screen and menu screen as images that will be displayed when
+instructions are requested.
+
+**BUGS:** I don't think there are any, but let's hope it doesn't look ugly in-game.
+
+**RESOURCES USED:** None.
+
+## Wednesday, 6/01, 9:00pm - 10:30pm
+**WHO:** Roy
+
+**WHAT:** Made a powerup indicator in the form of a message. 
+
+**BUGS:** None.
+
+**RESOURCES USED:** None.
+
+## Thursday, 6/02, 2:00am - 3:00am
+**WHO:** Avi 
+
+**WHAT:** Removed magic numbers and some pesky warnings. 
+
+**BUGS:** None. 
+
+**RESOURCES USED:** Stack Overflow to resolve warnings. 
+
+## Thursday, 6/02, 2:30pm - 3:00pm
+**WHO:** Kaushik 
+
+**WHAT:** Cleaned up demo code a bit.
+
+**BUGS:** None. 
+
+**RESOURCES USED:** None 
+
+## Thursday, 6/02, 5:30pm - 6:00pm
+**WHO:** Kaushik 
+
+**WHAT:** Set up enums for the current screen being displayed, and created color
+selection screen and uploaded image to assets folder.
+
+**BUGS:** None. 
+
+**RESOURCES USED:** None
+
+## Thursday, 6/02, 10:30pm - 11:30pm
+**WHO:** Kaushik 
+
+**WHAT:** Implemented navigation through menus.
+
+**BUGS:** Color selection doesn't actually allow the player to select their color. Need to
+think about how to do that. 
+
+**RESOURCES USED:** None
+
+## Thursday, 6/02, 11:30pm - 12:00am
+**WHO:** Roy 
+
+**WHAT:** Color selection works, put in free statements to prevent hella memory leaks
+
+**BUGS:** None! We're... done??
+
+**RESOURCES USED:** None

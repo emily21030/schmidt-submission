@@ -20,9 +20,14 @@ const double X_ORIGIN = 0;
 const double Y_ORIGIN = 0;
 const double WALL_THICKNESS = 20.0;
 const double GOAL_WIDTH = 200.0;
-
 const double REC_HEIGHT = 25.0;
 const double REC_WIDTH = 100.0;
+
+const vector_t MESSAGE_COORDS = (vector_t) {500.0, 0.0};
+const vector_t WIN_MESSAGE_COORDS = (vector_t){600.0, 300.0};
+const vector_t PAUSE_MESSAGE_COORDS_UPPER = (vector_t){600.0, 100.0};
+const vector_t PAUSE_MESSAGE_COORDS_LOWER = (vector_t){500.0, 400.0};
+
 const rgb_color_t RGB_GRAY = {0.5, 0.5, 0.5};
 const rgb_color_t RGB_BLACK = {0.0, 0.0, 0.0};
 const rgb_color_t RGB_WHITE = {1.0, 1.0, 1.0};
@@ -47,8 +52,8 @@ const vector_t UP_VEL = {0, 250};
 const vector_t DOWN_VEL = {0, -250};
 const vector_t LEFT_VEL = {-250, 0};
 const vector_t RIGHT_VEL = {250, 0};
-const double MIN_VEL = 150.0;
-const double MAX_VEL = 400.0;
+const double MIN_VEL = 200.0;
+const double MAX_VEL = 600.0;
 const double PUCK_MASS = 1;
 const int PUCK_RADIUS = 25;
 const int POWERUP_RADIUS = 20; 
@@ -80,6 +85,9 @@ char *X2_PLAYER_ACC_INFO = "a";
 char *HALF_ENEMY_ACC_INFO = "e";
 char *FREEZE_ENEMY_INFO = "f";
 
+char *INDICATOR_1_INFO = "i";
+char *INDICATOR_2_INFO = "j";
+
 int PPG = 1; 
 int PPG_POWERUP = 2; 
 
@@ -99,8 +107,25 @@ SDL_Surface *SCORE4;
 SDL_Surface *SCORE5;
 SDL_Surface *SCORE6;
 SDL_Surface *SCORE7;
+SDL_Surface *MENU_SCREEN;
+SDL_Surface *INFO_SCREEN;
+SDL_Surface *COLOR_SELECTION_SCREEN;
+SDL_Surface *DOUBLEACC_P;
+SDL_Surface *DOUBLEGOAL_P;
+SDL_Surface *DOUBLEVEL_P;
+SDL_Surface *FREEZE_P;
+SDL_Surface *HALFACC_P; 
+SDL_Surface *FIELD;
+SDL_Surface *BACKGROUND;
 
 typedef void (*powerup_func)(state_t *state); 
+
+typedef enum {
+  MENU = 1,
+  INFO = 2,
+  COLORS = 3,
+  GAME = 4
+} screen_t;
 
 typedef struct state {
   scene_t *scene;
@@ -109,11 +134,15 @@ typedef struct state {
   char *powerup_active;
   double powerup_time; 
   body_t *powerup_affects;
+  char *powerup_available; 
   int ppg; // points per goal
   int player_1_score;
   int player_2_score;
   double time_passed;
   powerup_func powerup; 
+  bool paused;
+  screen_t current_screen;
+  int color_choice;
 } state_t;
 
 int rand_between(int lower, int upper) {
@@ -169,91 +198,77 @@ list_t *get_bodies_by_type(scene_t *scene, char *type) {
   return body_list;
 }
 
-void key_handler_func_helper(double dt, body_t *body, vector_t acceleration) {
-  if (sqrt(vec_dot(body_get_velocity(body), body_get_velocity(body))) == 0) {
-    body_set_velocity(body, vec_multiply(MIN_VEL, unit_vector(acceleration)));
-    return;
-  }
-  vector_t new_velocity = vec_add(body_get_velocity(body), vec_multiply(dt, acceleration));
-  if (sqrt(vec_dot(new_velocity, new_velocity)) > MAX_VEL) {
-    new_velocity = vec_multiply(MAX_VEL, unit_vector(new_velocity));
-  } 
-  body_set_velocity(body, new_velocity);  
-}
-
-void vel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
-  vector_t new_vel_1 = {0, 0};
-  vector_t new_vel_2 = {0, 0};
-  if (keyboard_states[SDL_SCANCODE_W]) {
-    new_vel_1 = vec_add(new_vel_1, UP_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_A]) {
-    new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_S]) {
-    new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_D]) {
-    new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_UP]) {
-    new_vel_2 = vec_add(new_vel_2, UP_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_LEFT]) {
-    new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_DOWN]) {
-    new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_RIGHT]) {
-    new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
-    body_set_velocity(player_1, VEC_ZERO);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
-    body_set_velocity(player_2, VEC_ZERO);
-  }
-  body_set_velocity(player_1, new_vel_1);
-  body_set_velocity(player_2, new_vel_2);
-}
-
-void accel_key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
-  body_t *player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
-  body_t *player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
-  Uint8 *keyboard_states = SDL_GetKeyboardState(NULL);
-  if (keyboard_states[SDL_SCANCODE_W]) {
-    key_handler_func_helper(dt, player_1, UP_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_A]) {
-    key_handler_func_helper(dt, player_1, LEFT_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_S]) {
-    key_handler_func_helper(dt, player_1, DOWN_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_D]) {
-    key_handler_func_helper(dt, player_1, RIGHT_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_UP]) {
-    key_handler_func_helper(dt, player_2, UP_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_LEFT]) {
-    key_handler_func_helper(dt, player_2, LEFT_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_DOWN]) {
-    key_handler_func_helper(dt, player_2, DOWN_ACCEL);
-  }
-  if (keyboard_states[SDL_SCANCODE_RIGHT]) {
-    key_handler_func_helper(dt, player_2, RIGHT_ACCEL);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
-    body_set_velocity(player_1, VEC_ZERO);
-  }
-  if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
-    body_set_velocity(player_2, VEC_ZERO);
+void key_handler_func(state_t *state, char key_pressed, key_event_type_t event_type, double dt) {
+  body_t *player_1;
+  body_t *player_2;
+  Uint8 *keyboard_states = (Uint8 *)SDL_GetKeyboardState(NULL);
+  switch(state->current_screen) {
+    case GAME:
+      player_1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+      player_2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+      vector_t new_vel_1 = {0, 0};
+      vector_t new_vel_2 = {0, 0};
+      if (keyboard_states[SDL_SCANCODE_W]) {
+        new_vel_1 = vec_add(new_vel_1, UP_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_A]) {
+        new_vel_1 = vec_add(new_vel_1, LEFT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_S]) {
+        new_vel_1 = vec_add(new_vel_1, DOWN_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_D]) {
+        new_vel_1 = vec_add(new_vel_1, RIGHT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_UP]) {
+        new_vel_2 = vec_add(new_vel_2, UP_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_LEFT]) {
+        new_vel_2 = vec_add(new_vel_2, LEFT_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_DOWN]) {
+        new_vel_2 = vec_add(new_vel_2, DOWN_VEL);
+      }
+      if (keyboard_states[SDL_SCANCODE_RIGHT]) {
+        new_vel_2 = vec_add(new_vel_2, RIGHT_VEL);
+      }
+      if (!(keyboard_states[SDL_SCANCODE_W] || keyboard_states[SDL_SCANCODE_A] || keyboard_states[SDL_SCANCODE_S] || keyboard_states[SDL_SCANCODE_D])) {
+        body_set_velocity(player_1, VEC_ZERO);
+      }
+      if (!(keyboard_states[SDL_SCANCODE_UP] || keyboard_states[SDL_SCANCODE_LEFT] || keyboard_states[SDL_SCANCODE_DOWN] || keyboard_states[SDL_SCANCODE_RIGHT])) {
+        body_set_velocity(player_2, VEC_ZERO);
+      }
+      if (keyboard_states[SDL_SCANCODE_P] && event_type == KEY_PRESSED) {
+        state->paused = !(state->paused);
+      }
+      body_set_velocity(player_1, new_vel_1);
+      body_set_velocity(player_2, new_vel_2);
+      break;
+    case MENU:
+      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
+        state->current_screen = COLORS;
+      }
+      else if (keyboard_states[SDL_SCANCODE_I] && event_type == KEY_PRESSED) {
+        state->current_screen = INFO;
+      }
+      break;
+    case COLORS:
+      if (keyboard_states[SDL_SCANCODE_1] && event_type == KEY_PRESSED) {
+        state->current_screen = GAME;
+        state->color_choice = 1; 
+      }
+      else if (keyboard_states[SDL_SCANCODE_2] && event_type == KEY_PRESSED) {
+        state->current_screen = GAME;
+        state->color_choice = 2; 
+      }
+      break;
+    case INFO:
+      if (keyboard_states[SDL_SCANCODE_G] && event_type == KEY_PRESSED) {
+        state->current_screen = COLORS;
+      }
+      if (keyboard_states[SDL_SCANCODE_M] && event_type == KEY_PRESSED) {
+        state->current_screen = MENU;
+      }
   }
 }
 
@@ -411,15 +426,23 @@ char* rand_powerup() {
   }
 }
 
+void check_pause(state_t *state) {
+  sdl_render_text("Game paused", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_UPPER); 
+  sdl_render_text("Press 'P' to resume", PACIFICO, RGB_BLACK, PAUSE_MESSAGE_COORDS_LOWER);
+}
 
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
-    sdl_render_text(WIN_MSG1, (vector_t){600.0, 400.0}); 
-    printf("Player 1 wins! \n");
+    render_background(BACKGROUND);
+    sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
+    Mix_HaltMusic();
+    SDL_Delay(1500); 
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
-    sdl_render_text(WIN_MSG2, (vector_t){600.0, 400.0}); 
-    printf("Player 2 wins! \n");
+    render_background(BACKGROUND);
+    sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
+    Mix_HaltMusic();
+    SDL_Delay(1500);
     exit(0);
   }
 }
@@ -446,14 +469,12 @@ void check_goal(state_t *state) {
     body_set_velocity(puck, VEC_ZERO);
     Mix_PlayChannel(-1, GOAL_SOUND, 0); 
     reset_positions(state); 
-    printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   } else if (body_get_centroid(puck).x < PADDING + (WALL_THICKNESS / 2)) {
     state->player_2_score = state->player_2_score + state->ppg;
     body_set_centroid(puck, (vector_t){(X_SIZE / 2), (Y_TABLE / 2) + PADDING});
     body_set_velocity(puck, VEC_ZERO);
     Mix_PlayChannel(-1, GOAL_SOUND, 0); 
     reset_positions(state); 
-    printf("%i || %i \n", state->player_1_score, state->player_2_score); 
   }
 }
 
@@ -524,53 +545,26 @@ void add_powerup(state_t *state, char* powerup) {
   double min_y =  POWERUP_RADIUS + PADDING + WALL_THICKNESS; 
   double rand_y = rand_between(min_y, max_y); 
   vector_t rand_center = (vector_t) {rand_x, rand_y};
-  rgb_color_t powerup_color; 
-  switch(*powerup) {
-    case X2_PUCK_VEL_INFO_C:
-      powerup_color = RED;
-      break;
-    case X2_NEXT_GOAL_INFO_C:
-      powerup_color = ORANGE;
-      break;
-    case X2_PLAYER_ACC_INFO_C:
-      powerup_color = YELLOW;
-      break;
-    case HALF_ENEMY_ACC_INFO_C:
-      powerup_color = GREEN_2;
-      break;
-    case FREEZE_ENEMY_INFO_C:
-      powerup_color = INDIGO;
-      break;
-    default:
-      powerup_color = BLUE;
-      break; 
-  }
-  body_t *powerup_body = make_circle(POWERUP_MASS, powerup_color, rand_center, POWERUP_RADIUS, powerup); 
+  body_t *powerup_body = make_circle(POWERUP_MASS, RGB_WHITE, rand_center, POWERUP_RADIUS, powerup); 
   scene_add_body(state->scene, powerup_body);   
+  state->powerup_available = powerup; 
 }
 
 powerup_func get_correct_powerup(char *info, state_t *state) {
   switch(*info) {
     case X2_PUCK_VEL_INFO_C:
-      printf("DOUBLE VELOCITY \n");
       return double_velocity;
     case X2_PLAYER_ACC_INFO_C:
-      printf("DOUBLE ACCEL \n");
       return double_accel;
     case X2_NEXT_GOAL_INFO_C:
-      printf("DOUBLE GOAL \n");
       return double_goal;
     case HALF_ENEMY_ACC_INFO_C:
-      printf("HALF ACCEL \n");
       return half_accel;
     case FREEZE_ENEMY_INFO_C:
-      printf("ENEMY FROZEN \n");
       return freeze_enemy;
     default:
-      printf("ENEMY FROZEN \n");
       return freeze_enemy;
   }
-  printf("ENEMY FROZEN \n");
   return freeze_enemy;
 }
 
@@ -583,7 +577,20 @@ void powerup_collide(state_t *state) {
       Mix_PlayChannel(-1, POWERUP_SOUND, 0); 
       state->powerup = get_correct_powerup(body_get_info(powerup_body), state);
       state->powerup_active = body_get_info(powerup_body); 
+      state->powerup_available = NULL; 
       body_remove(powerup_body); 
+    }
+  }
+}
+
+void wall_sounds(state_t *state) {
+  list_t *walls = get_bodies_by_type(state->scene, WALL_INFO);
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0); 
+  for(int i = 0; i < list_size(walls); i++) {
+    body_t *this_wall = list_get(walls, i); 
+    collision_info_t collided = find_collision(body_get_shape(puck), body_get_shape(this_wall));
+    if(collided.collided) {
+      Mix_PlayChannel(-1, BOUNCE_SOUND, 0); 
     }
   }
 }
@@ -613,23 +620,43 @@ void speed_limit(state_t *state) {
   body_t *affected = state->powerup_affects; 
   if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0 || strcmp(state->powerup_active, X2_PUCK_VEL_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(body_get_velocity(affected).x > 800.0) {
-      checkx = 800.0; 
+    if (fabs(body_get_velocity(affected).x) > MAX_VEL) {
+      if (body_get_velocity(affected).x > 0) {
+        checkx = MAX_VEL; 
+      }
+      else if (body_get_velocity(affected).x < 0) {
+        checkx = -MAX_VEL; 
+      }
     }
     double checky = body_get_velocity(affected).y;
-    if(body_get_velocity(affected).y > 800.0) {
-      checky = 800.0;
+    if(fabs(body_get_velocity(affected).y) > MAX_VEL) {
+      if(body_get_velocity(affected).y > 0) {
+        checky = MAX_VEL; 
+      }
+      else if(body_get_velocity(affected).y < 0) {
+        checky = -MAX_VEL; 
+      }
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
   else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
     double checkx = body_get_velocity(affected).x;
-    if(body_get_velocity(affected).x > 200.0) {
-      checkx = 200.0; 
+    if(fabs(body_get_velocity(affected).x) > MIN_VEL) {
+      if(body_get_velocity(affected).x > 0) {
+        checkx = MIN_VEL; 
+      }
+      else if(body_get_velocity(affected).x < 0) {
+        checkx = -MIN_VEL; 
+      }
     }
     double checky = body_get_velocity(affected).y;
-    if(body_get_velocity(affected).y > 200.0) {
-      checky = 200.0;
+    if(fabs(body_get_velocity(affected).y) > MIN_VEL) {
+      if(body_get_velocity(affected).y > 0) {
+        checky = MIN_VEL; 
+      }
+      else if(body_get_velocity(affected).y < 0) {
+        checky = -MIN_VEL; 
+      }
     }
     body_set_velocity(affected, (vector_t) {checkx, checky}); 
   }
@@ -640,8 +667,14 @@ void render_circle_sprites(state_t *state) {
   body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
   body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
   sdl_make_sprite(PUCK_IMG, puck, PUCK_RADIUS);
-  sdl_make_sprite(BLUE_PADDLE, player1, PADDLE_RADIUS);
-  sdl_make_sprite(RED_PADDLE, player2, PADDLE_RADIUS); 
+  if(state->color_choice == 2) {
+    sdl_make_sprite(RED_PADDLE, player1, PADDLE_RADIUS);
+    sdl_make_sprite(BLUE_PADDLE, player2, PADDLE_RADIUS); 
+  }
+  else {
+    sdl_make_sprite(BLUE_PADDLE, player1, PADDLE_RADIUS);
+    sdl_make_sprite(RED_PADDLE, player2, PADDLE_RADIUS); 
+  }
 }
 
 SDL_Surface *surface_from_score(int score) {
@@ -674,6 +707,79 @@ void draw_scoreboard(state_t *state) {
   render_scoreboard(player1score, player2score); 
 }
 
+void render_powerup_sprite(state_t *state) {
+  SDL_Surface *powerup; 
+  switch(*(state->powerup_available)) {
+    case X2_PUCK_VEL_INFO_C:
+      powerup = DOUBLEVEL_P;
+      break;
+    case X2_PLAYER_ACC_INFO_C:
+      powerup = DOUBLEACC_P;
+      break;
+    case X2_NEXT_GOAL_INFO_C:
+      powerup = DOUBLEGOAL_P;
+      break;
+    case FREEZE_ENEMY_INFO_C:
+      powerup = FREEZE_P;
+      break;
+    case HALF_ENEMY_ACC_INFO_C:
+      powerup = HALFACC_P;
+      break; 
+    default:
+      powerup = NULL; 
+  }
+  if(powerup != NULL) {
+    body_t *powerup_body = list_get(get_bodies_by_type(state->scene, state->powerup_available), 0); 
+    sdl_make_sprite(powerup, powerup_body, POWERUP_RADIUS); 
+  }
+}
+
+char *make_message(state_t *state) {
+  body_t *puck = list_get(get_bodies_by_type(state->scene, PUCK_INFO), 0);
+  body_t *player1 = list_get(get_bodies_by_type(state->scene, PLAYER_1_INFO), 0);
+  body_t *player2 = list_get(get_bodies_by_type(state->scene, PLAYER_2_INFO), 0);
+  char *message;
+  if(state->powerup_affects == puck) {
+    message = "Puck is extra fast!";
+  }
+  else if(state->powerup_affects == player1) {
+    if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0) {
+      message = "Player 1 is zooming!";
+    }
+    else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
+      message = "Player 1 is slow!";
+    }
+    else if(strcmp(state->powerup_active, FREEZE_ENEMY_INFO) == 0){
+      message = "Player 1 is frozen!";
+    }
+  }
+  else if(state->powerup_affects == player2) {
+    if(strcmp(state->powerup_active, X2_PLAYER_ACC_INFO) == 0) {
+      message = "Player 2 is zooming!";
+    }
+    else if(strcmp(state->powerup_active, HALF_ENEMY_ACC_INFO) == 0) {
+      message = "Player 2 is slow!";
+    }
+    else if(strcmp(state->powerup_active, FREEZE_ENEMY_INFO) == 0){
+      message = "Player 2 is frozen!";
+    }
+  }
+  if(strcmp(state->powerup_active, X2_NEXT_GOAL_INFO) == 0) {
+    message = "Double points!";
+  }
+  return message != NULL ? message : "Canada, eh?!"; 
+}
+
+void render_powerup_message(state_t *state) {
+  if(state->powerup_active == NULL) {
+    return; 
+  }
+  char *message = make_message(state); 
+  if(message != NULL) {
+    sdl_render_text(message, PACIFICO, RGB_BLACK, MESSAGE_COORDS);
+  }  
+}
+
 state_t *emscripten_init() {
   srand(time(NULL));
   sdl_init(VEC_ZERO, (vector_t){X_SIZE, Y_SIZE});
@@ -692,7 +798,10 @@ state_t *emscripten_init() {
   state->player_1_score = 0;
   state->player_2_score = 0;
   state->time_passed = 0.0; 
-  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 65); 
+  state->powerup_available = NULL; 
+  state->current_screen = MENU;
+  state->paused = false;
+  PACIFICO = TTF_OpenFont("assets/Pacifico.ttf", 50); 
   BOUNCE_SOUND = Mix_LoadWAV("assets/bounce.wav");
   GOAL_SOUND = Mix_LoadWAV("assets/goal.wav");
   POWERUP_SOUND = Mix_LoadWAV("assets/powerup.wav"); 
@@ -707,53 +816,116 @@ state_t *emscripten_init() {
   SCORE5 = IMG_Load("assets/score5.png");
   SCORE6 = IMG_Load("assets/score6.png");
   SCORE7 = IMG_Load("assets/score7.png");
-  sdl_on_key((key_handler_t)vel_key_handler_func);
+  DOUBLEACC_P = IMG_Load("assets/doubleacc.png");
+  DOUBLEGOAL_P = IMG_Load("assets/doublegoal.png");
+  DOUBLEVEL_P = IMG_Load("assets/doublevel.png");
+  FREEZE_P = IMG_Load("assets/freeze.png");
+  HALFACC_P = IMG_Load("assets/halfaccel.png");
+  MENU_SCREEN = IMG_Load("assets/menuscreen.png");
+  INFO_SCREEN = IMG_Load("assets/infoscreen.png");
+  COLOR_SELECTION_SCREEN = IMG_Load("assets/colorscreen.png");
+  FIELD = IMG_Load("assets/air_hockey_table_yeah_yeah.png");
+  BACKGROUND = IMG_Load("assets/background.png");
+  BACKGROUND_MUSIC = Mix_LoadMUS("assets/bkgmus.wav");
+  Mix_PlayMusic(BACKGROUND_MUSIC, -1);
+  sdl_on_key((key_handler_t)key_handler_func);
   return state;
 }
 
 void emscripten_main(state_t *state) {
   double dt = time_since_last_tick();
-  if (dt > 0) {
-    state->time_passed += 1;
-    if (state->time_passed >= POWERUP_TIME && list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS && state->powerup_active == NULL) { //adjust this for powerup cap
-      add_powerup(state, rand_powerup()); 
-      state->time_passed = 0.0;
-    }
-  }
-  if (state->powerup_active) {
-    state->powerup_time += 1;
-    if(state->powerup_time <= POWERUP_TIME) {
-      (*state).powerup(state); 
-    }
-    else {
-      if(state->powerup_active == X2_NEXT_GOAL_INFO) {
-        state->ppg = PPG; 
+  switch(state->current_screen) {
+    case GAME:
+      if (dt > 0) {
+        state->time_passed += 1;
+        if (state->time_passed >= POWERUP_TIME && list_size(get_all_powerups(state)) < MAX_NUM_POWERUPS && state->powerup_active == NULL) { //adjust this for powerup cap
+          add_powerup(state, rand_powerup()); 
+          state->time_passed = 0.0;
+        }
       }
-      state->powerup_active = NULL;
-      state->powerup_affects = NULL;
-      state->powerup_time = 0.0; 
-      printf("Powerup deactivated! \n");
-    }
+      if (state->powerup_active) {
+        state->powerup_time += 1;
+        if(state->powerup_time <= POWERUP_TIME) {
+          (*state).powerup(state); 
+        }
+        else {
+          if(state->powerup_active == X2_NEXT_GOAL_INFO) {
+            state->ppg = PPG; 
+          }
+          state->powerup_active = NULL;
+          state->powerup_affects = NULL;
+          state->powerup_time = 0.0; 
+        }
+      }
+      if (!(state->paused)) {
+        speed_limit(state);
+        powerup_collide(state);
+        wall_sounds(state);
+        check_player_1_boundary(state);
+        check_player_2_boundary(state);
+        change_player_designations(state);
+        scene_tick(state->scene, dt);
+        speed_limit(state);
+        check_goal(state);
+        check_win(state);
+        sdl_render_scene(state->scene);
+        render_background(BACKGROUND); 
+        sdl_make_table(FIELD, (vector_t) {X_SIZE / 4 + WALL_THICKNESS/2, Y_SIZE / 4 + WALL_THICKNESS/2}, X_TABLE - WALL_THICKNESS, Y_TABLE - WALL_THICKNESS);
+        render_circle_sprites(state);
+        draw_scoreboard(state);
+        if(state->powerup_available != NULL) {
+          render_powerup_sprite(state); 
+        }
+        if(state->powerup_active != NULL) {
+          render_powerup_message(state); 
+        }
+        if(state->powerup_active == NULL) {
+          sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, MESSAGE_COORDS); 
+        }
+      }
+      else {
+        check_pause(state);
+      }
+      sdl_clear();
+      break;
+    case MENU:
+      render_background(MENU_SCREEN);
+      break;
+    case INFO:
+      render_background(INFO_SCREEN);
+      break;
+    case COLORS:
+      render_background(COLOR_SELECTION_SCREEN);
+      break;
   }
-  speed_limit(state);
-  powerup_collide(state);
-  check_player_1_boundary(state);
-  check_player_2_boundary(state);
-  change_player_designations(state);
-  scene_tick(state->scene, dt);
-  speed_limit(state);
-  check_goal(state);
-  check_win(state);
-  sdl_render_scene(state->scene);
-  render_circle_sprites(state);
-  draw_scoreboard(state);
-  sdl_render_text("Canada, eh?!", PACIFICO, RGB_BLACK, (vector_t) {500, 0}); 
 }
 
 void emscripten_free(state_t *state) {
+  SDL_FreeSurface(MENU_SCREEN);
+  SDL_FreeSurface(INFO_SCREEN);
+  SDL_FreeSurface(COLOR_SELECTION_SCREEN);
   SDL_FreeSurface(PUCK_IMG);
   SDL_FreeSurface(BLUE_PADDLE);
   SDL_FreeSurface(RED_PADDLE);
+  SDL_FreeSurface(SCORE0);
+  SDL_FreeSurface(SCORE1);
+  SDL_FreeSurface(SCORE2);
+  SDL_FreeSurface(SCORE3);
+  SDL_FreeSurface(SCORE4);
+  SDL_FreeSurface(SCORE5);
+  SDL_FreeSurface(SCORE6);
+  SDL_FreeSurface(SCORE7);
+  SDL_FreeSurface(DOUBLEACC_P);
+  SDL_FreeSurface(DOUBLEVEL_P);
+  SDL_FreeSurface(DOUBLEGOAL_P);
+  SDL_FreeSurface(FREEZE_P);
+  SDL_FreeSurface(HALFACC_P);
+  SDL_FreeSurface(FIELD);
+  SDL_FreeSurface(BACKGROUND);
+  Mix_FreeChunk(BOUNCE_SOUND);
+  Mix_FreeChunk(POWERUP_SOUND);
+  Mix_FreeChunk(GOAL_SOUND);
+  Mix_FreeMusic(BACKGROUND_MUSIC);
   Mix_CloseAudio();
   TTF_CloseFont(PACIFICO);
   scene_free(state->scene);
