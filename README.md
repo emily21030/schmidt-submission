@@ -284,3 +284,13 @@ instructions are requested.
 **BUGS:** None. 
 
 **RESOURCES USED:** None 
+
+## Thursday, 6/02, 5:30pm - 6:00pm
+**WHO:** Kaushik 
+
+**WHAT:** Set up enums for the current screen being displayed, and created color
+selection screen and uploaded image to assets folder.
+
+**BUGS:** None. 
+
+**RESOURCES USED:** None 

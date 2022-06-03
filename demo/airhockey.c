@@ -107,6 +107,9 @@ SDL_Surface *SCORE4;
 SDL_Surface *SCORE5;
 SDL_Surface *SCORE6;
 SDL_Surface *SCORE7;
+SDL_Surface *MENU_SCREEN;
+SDL_Surface *INFO_SCREEN;
+SDL_Surface *COLOR_SELECTION_SCREEN;
 SDL_Surface *DOUBLEACC_P;
 SDL_Surface *DOUBLEGOAL_P;
 SDL_Surface *DOUBLEVEL_P;
@@ -116,6 +119,13 @@ SDL_Surface *FIELD;
 SDL_Surface *BACKGROUND;
 
 typedef void (*powerup_func)(state_t *state); 
+
+typedef enum {
+  MENU = 1,
+  INFO = 2,
+  COLORS = 3,
+  GAME = 4
+} screen_t;
 
 typedef struct state {
   scene_t *scene;
@@ -131,6 +141,7 @@ typedef struct state {
   double time_passed;
   powerup_func powerup; 
   bool paused;
+  screen_t current_screen;
 } state_t;
 
 int rand_between(int lower, int upper) {
