@@ -305,7 +305,7 @@ think about how to do that.
 
 **RESOURCES USED:** None
 
-## Thursday, 6/02, 11:30pm - 11:45pm
+## Thursday, 6/02, 11:30pm - 12:00am
 **WHO:** Roy 
 
 **WHAT:** Color selection works, put in free statements to prevent hella memory leaks

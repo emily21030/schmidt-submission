@@ -433,11 +433,13 @@ void check_pause(state_t *state) {
 
 void check_win(state_t *state) {
   if (state->player_1_score >= WIN_THRESHOLD) {
+    render_background(BACKGROUND);
     sdl_render_text("Player 1 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
     SDL_Delay(1500); 
     exit(0);
   } else if (state->player_2_score >= WIN_THRESHOLD) {
+    render_background(BACKGROUND);
     sdl_render_text("Player 2 wins!", PACIFICO, RGB_BLACK, WIN_MESSAGE_COORDS); 
     Mix_HaltMusic();
     SDL_Delay(1500);
